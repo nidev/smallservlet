@@ -1,5 +1,6 @@
 import "dart:convert";
 import "dart:io";
+import "dart:async";
 import "logger.dart";
 import "package:yaml/yaml.dart" as Yaml;
 import "package:path/path.dart" as Path;
@@ -40,7 +41,11 @@ class SSConfiguration {
     _Filename = "-memory-";
     _Dir = ":memory:";
 
-    _configMap = new Map<String, Object>();
+    // Initializing
+    _configMap = new Map<String, Object>.fromIterable(ConfigurationKeys,
+      key: (anyObject) => anyObject.toString(),
+      value: (anyObject) => ""
+    );
   }
 
   SSConfiguration.fromFile(String dir, String fname) {
@@ -99,12 +104,48 @@ class SSConfiguration {
     }
   }
 
-  void saveChanges() {
-    throw new UnimplementedError("Coming soon");
+  Future<File> writeToJSON(String dir, String filename) async {
+    File targetFile = new File(Path.join(dir, filename));
+    Logger log = new Logger(TAG);
+
+    if (await targetFile.exists()) {
+      log.w("File exists. Writing configuration will overwrite the file: ${filename}");
+    }
+
+    JsonEncoder encoder = new JsonEncoder.withIndent("  ", (unencodable) => "");
+
+    // TODO: Line separator issue(CR_LF vs LF vs CR)
+    String serialized = encoder.convert(_configMap);
+
+    return targetFile.writeAsString(serialized,
+      mode: FileMode.WRITE,
+      encoding: Encoding.getByName("UTF-8"),
+      flush: true);
+  }
+
+  Future<File> writeToYAML(String dir, String filename) async {
+    File targetFile = new File(Path.join(dir, filename));
+    Logger log = new Logger(TAG);
+
+    if (await targetFile.exists()) {
+      log.w("File exists. Writing configuration will overwrite the file: ${filename}");
+    }
+    // TODO: Is there an well-made serializer?
+    // TODO: Line separator issue(CR_LF vs LF vs CR)
+    StringBuffer stringBuffer = new StringBuffer();
+    _configMap.forEach((key, value) {
+      stringBuffer.writeln("${key}: ${value.toString()}");
+    });
+
+    return targetFile.writeAsString(stringBuffer.toString(),
+      mode: FileMode.WRITE,
+      encoding: Encoding.getByName("UTF-8"),
+      flush: true);
   }
 
   dynamic operator[](String key) {
     // TODO: Check key availability
+    // TODO: Type conversion
     return _configMap[key];
   }
 }
