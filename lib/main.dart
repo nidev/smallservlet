@@ -1,13 +1,13 @@
 // encoding: utf-8
 
-import "logger.dart";
-import "cache.dart";
-import "config.dart";
-import "version.dart";
+import "package:smallservlet/src/logger.dart";
+import "package:smallservlet/src/cache.dart";
+import "package:smallservlet/src/config.dart";
+import "package:smallservlet/version.dart";
 
 const String TAG = "Main";
 
-void main() {
+void bootstrap(List<String> arguments) {
   final log = new Logger("Main");
   final appVersion = getPackageVersion();
 
