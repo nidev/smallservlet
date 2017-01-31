@@ -1,0 +1,13 @@
+{
+  "bind.host": "",
+  "bind.port": "",
+  "cache.size": "",
+  "cache.lifeseconds": "",
+  "redis.host": "",
+  "redis.port": "",
+  "redis.username": "",
+  "redis.password": "",
+  "loglevel": "",
+  "max_connection": "",
+  "rootdir": ""
+}
