@@ -1,7 +1,7 @@
 import "dart:convert";
 import "dart:io";
 import "dart:async";
-import "logger.dart";
+import "package:smallservlet/src/logger.dart";
 import "package:yaml/yaml.dart" as Yaml;
 import "package:path/path.dart" as Path;
 
@@ -143,9 +143,18 @@ class SSConfiguration {
       flush: true);
   }
 
+  /**
+   * If value can be converted to number, this will return number type.
+   * In other cases, this function returns String with no exception.
+   */
   dynamic operator[](String key) {
-    // TODO: Check key availability
-    // TODO: Type conversion
-    return _configMap[key];
+    RegExp goodNumber = new RegExp(r"^[0-9]+$");
+    String value = _configMap[key].toString();
+
+    if (goodNumber.hasMatch(value)) {
+      return int.parse(value);
+    }
+
+    return value;
   }
 }
