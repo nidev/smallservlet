@@ -1,11 +1,22 @@
-bind.host: 
-bind.port: 
-cache.size: 
-cache.lifeseconds: 
-redis.host: 
-redis.port: 
-redis.username: 
-redis.password: 
-loglevel: 
-max_connection: 
-rootdir: 
+# Host address to be bound. 0.0.0.0 for accepting all on IPv4
+bind.host:
+# Port number to be bound. Avoid well-known ports like 80 if you already have an running service
+bind.port:
+# Set cache size in the number of Key-Value items. 0 to disable cache feature
+cache.size:
+# Set lifetime in seconds for each cached item
+cache.lifeseconds:
+# Host address of Redis server for cache
+redis.host:
+# Port number of Redis server for cache
+redis.port:
+# Redis username
+redis.username:
+# Redis password
+redis.password:
+# Set log level. (0: Error only, 1: Error, Warn 2: Error, Warn, Notify, 3: All - default)
+loglevel:
+# Maximum number of accepting connections. It depends on your kernel settings
+max_connection:
+# Absolute path to servlet root directory
+rootdir:
