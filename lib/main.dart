@@ -3,7 +3,10 @@ import "dart:io";
 import "package:args/args.dart";
 import "package:smallservlet/src/logger.dart";
 import "package:smallservlet/src/cache.dart";
+import "package:smallservlet/src/cache_driver/nocache.dart";
+import "package:smallservlet/src/cache_driver/redis.dart";
 import "package:smallservlet/src/config.dart";
+import "package:smallservlet/src/servlet.dart";
 import "package:smallservlet/version.dart";
 
 
@@ -36,11 +39,10 @@ void bootstrap(List<String> arguments) {
   final config = new SSConfiguration.fromFile("", configFilePath);
   log.n("Load configuration");
 
-  final cache = new HttpCache(config[CFG_CACHE__SIZE], config[CFG_CACHE__LIFESECONDS]);
+  // TODO: Read configuration and choose correct driver.
+  final cache = new HttpCache.withDriver(new NoCacheDriver());
   log.n("Initiate cache");
 
-  cache.connectRedis();
-  cache.clearPool();
 
   final servletEngine = new ServletEngine();
   log.n("Initiate servlet engine");

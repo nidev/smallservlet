@@ -1,21 +1,18 @@
 // encoding: utf-8
-import "package:redis/redis.dart";
+import "package:smallservlet/src/cache_driver/base.dart";
 
 class HttpCache {
-  HttpCache(int cacheSize, int lifetime_secs) {
-    throw new UnimplementedError();
+  BaseCacheDriver _driver;
+
+  HttpCache() {
+    throw new Exception("Do not construct cache object with default constructor. Use HttpCache.withDriver() instead.");
   }
 
-  void connectRedis() {
-    throw new UnimplementedError();
+  HttpCache.withDriver(BaseCacheDriver cacheDriver) {
+    _driver = cacheDriver;
   }
 
-  void clearPool() {
+  dynamic operator[](String key) {
     throw new UnimplementedError();
-  }
-  
-  Object operator[](String key) {
-    throw new UnimplementedError();
-    return null;
   }
 }
