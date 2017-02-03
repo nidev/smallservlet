@@ -17,6 +17,20 @@ class NoCacheDriver implements BaseCacheDriver {
   }
 
   /**
+   * Return lifetime in second
+   */
+  int getLifetimeSeconds() {
+    return 0;
+  }
+
+  /**
+   * Set lifetime length in second
+   */
+  void setLifetimeSeconds(int size) {
+    int _ = size;
+  }
+
+  /**
    * Check whether cache already knows the key and confirms its valid lifetime.
    */
   bool hasValue(String key) {

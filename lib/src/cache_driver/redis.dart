@@ -18,6 +18,20 @@ class RedisCacheDriver implements BaseCacheDriver {
   }
 
   /**
+   * Return lifetime in second
+   */
+  int getLifetimeSeconds() {
+    throw new UnimplementedError();
+  }
+
+  /**
+   * Set lifetime length in second
+   */
+  void setLifetimeSeconds(int size) {
+    throw new UnimplementedError();
+  }
+
+  /**
    * Check whether cache already knows the key and confirms its valid lifetime.
    */
   bool hasValue(String key) {
