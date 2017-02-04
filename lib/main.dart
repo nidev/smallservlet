@@ -1,11 +1,13 @@
 // encoding: utf-8
 import "dart:io";
+import "dart:async";
 import "package:args/args.dart";
 import "package:smallservlet/src/logger.dart";
-import "package:smallservlet/src/cache.dart";
-import "package:smallservlet/src/cache_driver/nocache.dart";
-import "package:smallservlet/src/cache_driver/redis.dart";
+import "package:smallservlet/src/cache_driver/base.dart" as Cache;
+import "package:smallservlet/src/cache_driver/nocache.dart" as Cache;
+import "package:smallservlet/src/cache_driver/redis.dart" as Cache;
 import "package:smallservlet/src/config.dart";
+import "package:smallservlet/src/exception/exceptions.dart";
 import "package:smallservlet/src/servlet.dart";
 import "package:smallservlet/version.dart";
 
@@ -34,16 +36,43 @@ void bootstrap(List<String> arguments) {
     print(parser.usage);
     exit(1);
   }
+
   String configFilePath = parsed["config"];
 
-  final config = new SSConfiguration.fromFile("", configFilePath);
+  final SSConfiguration config = new SSConfiguration.fromFile("", configFilePath);
   log.n("Load configuration");
 
-  // TODO: Read configuration and choose correct driver.
-  final cache = new HttpCache.withDriver(new NoCacheDriver());
+  Cache.BaseCacheDriver cacheDriver = new Cache.NoCacheDriver();
+  if (config[CFG_CACHE__SIZE] > 0) {
+    cacheDriver = new Cache.RedisCacheDriver();
+    cacheDriver.setCacheSize(config[CFG_CACHE__SIZE]);
+    cacheDriver.setLifetimeSeconds(config[CFG_CACHE__LIFESECONDS]);
+  }
   log.n("Initiate cache");
 
-
-  final servletEngine = new ServletEngine();
+  final servletEngine = new ServletEngine(config[CFG_BIND__HOST], config[CFG_BIND__PORT], config[CFG_ROOTDIR]);
+  servletEngine
+    ..setMaxConnection(config[CFG_MAX_CONNECTION])
+    ..setCacheDriver(cacheDriver);
   log.n("Initiate servlet engine");
+
+  servletEngine.testOperationOnce(parsed.wasParsed("dry") && parsed["dry"])
+    .then((realServletEngine) => realServletEngine.doServe())
+    .catchError((e) {
+      log.e("Exception occured : ${e}");
+    })
+    .whenComplete(() {
+      try {
+        servletEngine.haltGracefully();
+      }
+      on Exception catch (e, s) {
+        log.e("SmallServlet could not halt service gracefully.");
+        log.e("Your configuration, runtime or OS may have serious problem.");
+        log.e("Please check everything around SmallServlet");
+        log.e("Exception : ${e}");
+        log.e("Stack Trace : ${s}");
+
+        servletEngine.haltEmergency();
+      }
+    });
 }
