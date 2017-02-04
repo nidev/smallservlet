@@ -22,8 +22,8 @@ abstract class BaseCacheDriver {
   /**
    * Set lifetime length in second
    */
-  void setLifetimeSeconds(int size);
-  
+  void setLifetimeSeconds(int seconds);
+
   /**
    * Check whether cache already knows the key and confirms its valid lifetime.
    */

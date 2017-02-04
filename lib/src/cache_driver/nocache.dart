@@ -26,8 +26,8 @@ class NoCacheDriver implements BaseCacheDriver {
   /**
    * Set lifetime length in second
    */
-  void setLifetimeSeconds(int size) {
-    int _ = size;
+  void setLifetimeSeconds(int seconds) {
+    int _ = seconds;
   }
 
   /**
