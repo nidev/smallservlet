@@ -11,8 +11,6 @@
   "comment ^": "Host address of Redis server for cache",
   "redis.port": "",
   "comment ^": "Port number of Redis server for cache",
-  "redis.username": "",
-  "comment ^": "Redis username",
   "redis.password": "",
   "comment ^": "Redis password",
   "loglevel": "",

@@ -10,8 +10,6 @@ cache.lifeseconds:
 redis.host:
 # Port number of Redis server for cache
 redis.port:
-# Redis username
-redis.username:
 # Redis password
 redis.password:
 # Set log level. (0: Error only, 1: Error, Warn 2: Error, Warn, Notify, 3: All - default)
