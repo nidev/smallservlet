@@ -15,6 +15,11 @@ abstract class BaseCacheDriver {
   void setCacheSize(int size);
 
   /**
+   * Get how many items are in cache
+   */
+  int countItems();
+
+  /**
    * Return lifetime in second
    */
   int getLifetimeSeconds();
@@ -36,6 +41,13 @@ abstract class BaseCacheDriver {
    */
   dynamic operator[](String key);
 
+  /**
+   * Set value to cache. If cache has already same key and key is still valid, no overwriting/updating occurs.
+   */
+  void operator[]=(String key, dynamic value) {
+    throw new UnimplementedError();
+  }
+  
   /**
    * Compress cache immediately.
    * If set 'brutally', 50% of cached items will be removed even they are valid lifetime.

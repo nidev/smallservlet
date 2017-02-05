@@ -17,6 +17,13 @@ class NoCacheDriver implements BaseCacheDriver {
   }
 
   /**
+   * Get how many items are in cache
+   */
+  int countItems() {
+    return 0;
+  }
+
+  /**
    * Return lifetime in second
    */
   int getLifetimeSeconds() {
@@ -44,6 +51,13 @@ class NoCacheDriver implements BaseCacheDriver {
    */
   dynamic operator[](String key) {
     return null;
+  }
+
+  /**
+   * Set value to cache. If cache has already same key and key is still valid, no overwriting/updating occurs.
+   */
+  void operator[]=(String key, dynamic value) {
+    throw new UnimplementedError();
   }
 
   /**
