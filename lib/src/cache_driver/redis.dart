@@ -5,7 +5,7 @@ import "package:smallservlet/src/cache_driver/base.dart";
 
 class RedisCacheDriver implements BaseCacheDriver {
   RedisConnection _redis;
-  Fucntion _redisCommander;
+  Function _redisCommander;
   int _lifetimeSeconds = 0;
   int _cacheSize = 0;
 
