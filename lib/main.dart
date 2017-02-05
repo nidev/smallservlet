@@ -44,7 +44,7 @@ void bootstrap(List<String> arguments) {
 
   Cache.BaseCacheDriver cacheDriver = new Cache.NoCacheDriver();
   if (config[CFG_CACHE__SIZE] > 0) {
-    cacheDriver = new Cache.RedisCacheDriver();
+    cacheDriver = new Cache.RedisCacheDriver(host: config[CFG_REDIS__HOST], port: config[CFG_REDIS__PORT], password: config[CFG_REDIS__PASSWORD]);
     cacheDriver.setCacheSize(config[CFG_CACHE__SIZE]);
     cacheDriver.setLifetimeSeconds(config[CFG_CACHE__LIFESECONDS]);
   }
@@ -57,7 +57,7 @@ void bootstrap(List<String> arguments) {
   log.n("Initiate servlet engine");
 
   servletEngine.testOperationOnce(parsed.wasParsed("dry") && parsed["dry"])
-    .then((realServletEngine) => realServletEngine.doServe())
+    .then((realServletEngine) async => await realServletEngine.doServe())
     .catchError((e) {
       log.e("Exception occured : ${e}");
     })

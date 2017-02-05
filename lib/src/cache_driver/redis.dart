@@ -1,19 +1,70 @@
 // encoding: utf-8
-import "package:smallservlet/src/cache_driver/base.dart";
+import "dart:async";
 import "package:redis/redis.dart";
+import "package:smallservlet/src/cache_driver/base.dart";
 
 class RedisCacheDriver implements BaseCacheDriver {
+  RedisConnection _redis;
+  Fucntion _redisCommander;
+  int _lifetimeSeconds = 0;
+  int _cacheSize = 0;
+
+  RedisCacheDriver({String host = "127.0.0.1", int port = 6379, String password = ""}) {
+    _redis = new RedisConnection();
+
+    // Construct Commander closure
+    _redisCommander = (redisCommandArray) {
+      _redis.connect(host, port)
+        .then((command) {
+          Future<String> authenticate;
+
+          if (password.isNotEmpty) {
+            authenticate = command.send_object(["AUTH", password]);
+          }
+          else {
+            authenticate = new Future<String>.value("OK");
+          }
+
+          authenticate.then((response) {
+            if (response == "OK") {
+              return command.send_object(redisCommandArray);
+            }
+            else {
+              throw new Exception("Incorrect password. Redis access is unauthroized.");
+            }
+          })
+          .then((response) {
+            return response;
+          })
+          .catchError((e) {
+            // TODO: Propagate error
+            return null;
+          });
+
+        });
+      };
+  }
+
   /**
    * Return cache size in the number of Key-Value items
    */
   int getCacheSize() {
-    throw new UnimplementedError();
+    return _cacheSize;
   }
 
   /**
    * Set cache size in the number of Key-Value items
    */
   void setCacheSize(int size) {
+    _cacheSize = size;
+
+    // TODO: Manage Redis
+  }
+
+  /**
+   * Get how many items are in cache
+   */
+  int countItems() {
     throw new UnimplementedError();
   }
 
@@ -21,14 +72,14 @@ class RedisCacheDriver implements BaseCacheDriver {
    * Return lifetime in second
    */
   int getLifetimeSeconds() {
-    throw new UnimplementedError();
+    return _lifetimeSeconds;
   }
 
   /**
    * Set lifetime length in second
    */
-  void setLifetimeSeconds(int size) {
-    throw new UnimplementedError();
+  void setLifetimeSeconds(int seconds) {
+    _lifetimeSeconds = seconds;
   }
 
   /**
@@ -44,6 +95,13 @@ class RedisCacheDriver implements BaseCacheDriver {
    * If key is in cache and outdated, return null and key and its value will be removed.
    */
   dynamic operator[](String key) {
+    throw new UnimplementedError();
+  }
+
+  /**
+   * Set value to cache. If cache has already same key and key is still valid, no overwriting/updating occurs.
+   */
+  void operator[]=(String key, dynamic value) {
     throw new UnimplementedError();
   }
 
