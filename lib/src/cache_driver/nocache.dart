@@ -57,7 +57,7 @@ class NoCacheDriver implements BaseCacheDriver {
    * Set value to cache. If cache has already same key and key is still valid, no overwriting/updating occurs.
    */
   void operator[]=(String key, dynamic value) {
-    throw new UnimplementedError();
+    ;
   }
 
   /**
