@@ -3,7 +3,7 @@ const String TAG = "Version";
 
 const VERSION_MAJOR = 1;
 const VERSION_MINOR = 0;
-const String versionString = "${VERSION_MAJOR}.${VERSION_MINOR}";
+const String VERSION_STRING = "${VERSION_MAJOR}.${VERSION_MINOR}";
 
 enum VersionComparisonResult { HIGHER, EQUAL, LOWER }
 
