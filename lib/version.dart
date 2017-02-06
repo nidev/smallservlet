@@ -11,32 +11,32 @@ enum VersionComparisonResult { HIGHER, EQUAL, LOWER }
  *
  */
 class VersionData {
-  int major = 0;
-  int minor = 0;
+  int _major = 0;
+  int _minor = 0;
 
-  VersionData(this.major, this.minor);
+  VersionData(this._major, this._minor);
   VersionData.fromString(String version) {
     List<String> splitString = version.split(".");
     if (splitString.length != 2) {
       throw new Exception("Expect a version string (format: X.YY)");
     }
 
-    major = int.parse(splitString[0]);
-    minor = int.parse(splitString[1]);
+    _major = int.parse(splitString[0]);
+    _minor = int.parse(splitString[1]);
   }
 
   bool operator<(VersionData other) {
-    return (this.major < other.major)
-      || (this.major == other.major && this.minor <= other.minor);
+    return (this._major < other._major)
+      || (this._major == other._major && this._minor <= other._minor);
   }
 
   bool operator==(VersionData other) {
-    return (this.major == other.major && this.minor == other.minor);
+    return (this._major == other._major && this._minor == other._minor);
   }
 
   bool operator>(VersionData other) {
-    return (this.major > other.major)
-      || (this.major == other.major && this.minor >= other.minor);
+    return (this._major > other._major)
+      || (this._major == other._major && this._minor >= other._minor);
   }
 
   bool operator>=(VersionData other) {
@@ -47,8 +47,11 @@ class VersionData {
     return this < other || this == other;
   }
 
+  int getMajorVersion() => _major;
+  int getMinorVersion() => _minor;
+
   String toString() {
-    return "${this.major}.${this.minor}";
+    return "${this._major}.${this._minor}";
   }
 }
 
