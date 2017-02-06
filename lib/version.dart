@@ -10,7 +10,7 @@ enum VersionComparisonResult { HIGHER, EQUAL, LOWER }
 /**
  *
  */
-class VersionData {
+class VersionData implements Comparable {
   int _major = 0;
   int _minor = 0;
 
@@ -50,8 +50,22 @@ class VersionData {
   int getMajorVersion() => _major;
   int getMinorVersion() => _minor;
 
+  @override
   String toString() {
     return "${this._major}.${this._minor}";
+  }
+
+  @override
+  int compareTo(other) {
+    if (this < other) {
+      return -1;
+    }
+    else if (this == other) {
+      return 0;
+    }
+    else {
+      return -1;
+    }
   }
 }
 
