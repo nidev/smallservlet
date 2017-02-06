@@ -39,3 +39,4 @@ pubspec.lock
 
 # Editor caches
 .atom
+.vscode
