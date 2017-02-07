@@ -74,13 +74,13 @@ void main(List<String> args) {
     });
 
     test("1.1 != 1.1 for same objects   => false", () {
-      expect(b == b, equals(false));
-      expect(b.hashCode == b.hashCode, equals(false));
+      expect(b != b, equals(false));
+      expect(b.hashCode == b.hashCode, equals(true));
     });
 
     test("1.1 != 1.1 for different objects   => false", () {
-      expect(b == d, equals(false));
-      expect(b.hashCode != d.hashCode, equals(false));
+      expect(b != d, equals(false));
+      expect(b.hashCode != d.hashCode, equals(true));
     });
 
     test("1.1 <= 1.1   => true", () {
