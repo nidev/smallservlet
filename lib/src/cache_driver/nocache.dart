@@ -1,4 +1,5 @@
 // encoding: utf-8
+import "dart:async";
 import "package:smallservlet/src/cache_driver/base.dart";
 
 class NoCacheDriver implements BaseCacheDriver {
@@ -19,8 +20,8 @@ class NoCacheDriver implements BaseCacheDriver {
   /**
    * Get how many items are in cache
    */
-  int countItems() {
-    return 0;
+  Future<int> countItems() {
+    return new Future<int>.value(0);
   }
 
   /**
@@ -40,8 +41,8 @@ class NoCacheDriver implements BaseCacheDriver {
   /**
    * Check whether cache already knows the key and confirms its valid lifetime.
    */
-  bool hasValue(String key) {
-    return false;
+  Future<bool> hasValue(String key) async {
+    return new Future<bool>.value(false);
   }
 
   /**
@@ -49,8 +50,8 @@ class NoCacheDriver implements BaseCacheDriver {
    * If key is not in cache, returns null.
    * If key is in cache and outdated, return null and key and its value will be removed.
    */
-  dynamic operator[](String key) {
-    return null;
+  Future<dynamic> operator[](String key) async {
+    return new Future.value(null);
   }
 
   /**
@@ -71,8 +72,8 @@ class NoCacheDriver implements BaseCacheDriver {
   /**
    * Clear cache. NoCacheDriver does nothing.
    */
-  void emptify() {
-    ;
+  Future emptify() async {
+    return new Future.value(null);
   }
 
   /**
@@ -86,15 +87,15 @@ class NoCacheDriver implements BaseCacheDriver {
   /**
    * Check whether backbone is healthy and can interact.
    */
-  bool checkBackbone() {
-    return false;
+  Future<bool> checkBackbone() async {
+    return new Future<bool>.value(false);
   }
 
   /**
    * Recover backbone from malfunctioning like disconnection.
    * NoCacheDriver does nothing.
    */
-  bool recoverBackbone() {
-    return false;
+  Future<bool> recoverBackbone() async {
+    return new Future<bool>.value(false);
   }
 }

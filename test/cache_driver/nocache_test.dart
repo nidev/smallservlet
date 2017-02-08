@@ -1,4 +1,5 @@
 @TestOn("vm")
+import "dart:async";
 import "package:test/test.dart";
 import "package:smallservlet/src/cache_driver/nocache.dart";
 
@@ -19,10 +20,10 @@ void main() {
       () => expect(noCacheDriver.hasBackbone(), equals(false)));
 
     test("Can not check cache backbone health",
-      () => expect(noCacheDriver.checkBackbone(), equals(false)));
+      () => expect(noCacheDriver.checkBackbone(), completion(equals(false))));
 
     test("Can not recover cache backbone from failure",
-      () => expect(noCacheDriver.recoverBackbone(), equals(false)));
+      () => expect(noCacheDriver.recoverBackbone(), completion(equals(false))));
   });
 
   group("'No configurable option for NoCacheDriver' test", () {
@@ -73,23 +74,23 @@ void main() {
 
     test("Check nothing is available in cache", () {
       paths.forEach((path) {
-        expect(noCacheDriver[path], equals(null));
+        expect(noCacheDriver[path], completion(equals(null)));
       });
     });
 
-    tearDown(() {
-      noCacheDriver.emptify();
+    tearDown(() async {
+      await noCacheDriver.emptify();
     });
   });
 
   group("Emptifying", () {
-    test("Check it really works", () {
-      noCacheDriver.emptify();
-      expect(noCacheDriver.countItems(), equals(0));
+    test("Check it really works", () async {
+      await noCacheDriver.emptify();
+      expect(noCacheDriver.countItems(), completion(equals(0)));
     });
   });
 
-  tearDown(() {
-    noCacheDriver.emptify();
+  tearDown(() async {
+    await noCacheDriver.emptify();
   });
 }
