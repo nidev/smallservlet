@@ -13,10 +13,12 @@
   "comment ^": "Port number of Redis server for cache",
   "redis.password": "",
   "comment ^": "Redis password",
+  "redis.key": "",
+  "comment ^": "Set cache key name for Redis. ':H' is automatically appended on creating Hash key, ':L' on creating List key",
   "loglevel": "",
   "comment ^": "Set log level. (0: Error only, 1: Error, Warn 2: Error, Warn, Notify, 3: All - default)",
   "max_connection": "",
   "comment ^": "Maximum number of accepting connections. It depends on your kernel settings",
   "rootdir": "",
-  "comment ^": "Absolute path to servlet root directory",
+  "comment ^": "Absolute path to servlet root directory"
 }
