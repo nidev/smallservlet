@@ -44,9 +44,15 @@ void bootstrap(List<String> arguments) {
 
   Cache.BaseCacheDriver cacheDriver = new Cache.NoCacheDriver();
   if (config[CFG_CACHE__SIZE] > 0) {
-    cacheDriver = new Cache.RedisCacheDriver(host: config[CFG_REDIS__HOST], port: config[CFG_REDIS__PORT], password: config[CFG_REDIS__PASSWORD]);
-    cacheDriver.setCacheSize(config[CFG_CACHE__SIZE]);
-    cacheDriver.setLifetimeSeconds(config[CFG_CACHE__LIFESECONDS]);
+    cacheDriver = new Cache.RedisCacheDriver(
+      host: config[CFG_REDIS__HOST],
+      port: config[CFG_REDIS__PORT],
+      password: config[CFG_REDIS__PASSWORD],
+      redisKey: config[CFG_REDIS__KEY]
+    );
+    cacheDriver
+      ..setCacheSize(config[CFG_CACHE__SIZE])
+      ..setLifetimeSeconds(config[CFG_CACHE__LIFESECONDS]);
   }
   log.n("Initiate cache");
 

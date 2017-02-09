@@ -3,46 +3,73 @@ import "dart:async";
 import "package:redis/redis.dart";
 import "package:smallservlet/src/cache_driver/base.dart";
 
+const String REDIS_INDEX_SUFFIX = ":L";
+const String REDIS_HASH_SUFFIX = ":H";
+
 class RedisCacheDriver implements BaseCacheDriver {
   RedisConnection _redis;
   Function _redisCommander;
-  int _lifetimeSeconds = 0;
-  int _cacheSize = 0;
+  Function _redisMultiCommander;
+  int _lifetimeSeconds = 120;
+  int _cacheSize = 36;
+  
+  String _redisHashKey;
+  String _redisIndexKey;
 
-  RedisCacheDriver({String host = "127.0.0.1", int port = 6379, String password = ""}) {
+  void set _redisKey(String baseKey) {
+    if (baseKey == null || baseKey == "") {
+      throw new Exception("Cache key can not be null or empty string");
+    }
+
+    _redisIndexKey = "${baseKey}${REDIS_INDEX_SUFFIX}";
+    _redisHashKey = "${baseKey}${REDIS_HASH_SUFFIX}";
+  }
+
+  RedisCacheDriver({String host = "127.0.0.1", int port = 6379, String password = "", String redisKey = ""}) {
     _redis = new RedisConnection();
+    _redisKey = redisKey;
 
     // Construct Commander closure
-    _redisCommander = (redisCommandArray) {
-      _redis.connect(host, port)
-        .then((command) {
-          Future<String> authenticate;
+    _redisCommander = (redisCommand) async {
+      Command command = await _redis.connect(host, port);
 
-          if (password.isNotEmpty) {
-            authenticate = command.send_object(["AUTH", password]);
-          }
-          else {
-            authenticate = new Future<String>.value("OK");
-          }
+      String authenticate = "OK";
+      if (password.isNotEmpty) {
+        authenticate = await command.send_object(["AUTH", password]);
+      }
 
-          authenticate.then((response) {
-            if (response == "OK") {
-              return command.send_object(redisCommandArray);
-            }
-            else {
-              throw new Exception("Incorrect password. Redis access is unauthroized.");
-            }
-          })
-          .then((response) {
-            return response;
-          })
-          .catchError((e) {
-            // TODO: Propagate error
-            return null;
+      if (authenticate == "OK") {
+        return command.send_object(redisCommand);
+      }
+      else {
+        throw new Exception("Incorrect password. Redis access is unauthorized.");
+      }
+    };
+
+    _redisMultiCommander = (List<List<String>> redisCommands) async {
+      Command command = await _redis.connect(host, port);
+
+      String authenticate = "OK";
+      if (password.isNotEmpty) {
+        authenticate = await command.send_object(["AUTH", password]);
+      }
+
+      if (authenticate == "OK") {
+        return command.multi().then((Transaction t) {
+          t.pipe_start();
+          
+          redisCommands.forEach((redisCommand) {
+            t.send_object(redisCommand);
           });
 
+          t.pipe_end();
+          return t.exec();
         });
-      };
+      }
+      else {
+        throw new Exception("Incorrect password. Redis access is unauthorized.");
+      }
+    };
   }
 
   /**
@@ -57,15 +84,13 @@ class RedisCacheDriver implements BaseCacheDriver {
    */
   void setCacheSize(int size) {
     _cacheSize = size;
-
-    // TODO: Manage Redis
   }
 
   /**
    * Get how many items are in cache
    */
-  int countItems() {
-    throw new UnimplementedError();
+  Future<int> countItems() async {
+    return _redisCommander(["ZCOUNT", _redisIndexKey, "-inf", "+inf"]);
   }
 
   /**
@@ -85,8 +110,8 @@ class RedisCacheDriver implements BaseCacheDriver {
   /**
    * Check whether cache already knows the key and confirms its valid lifetime.
    */
-  bool hasValue(String key) {
-    throw new UnimplementedError();
+  Future<bool> hasValue(String key) {
+    int found = _redisCommander(["Z"]);
   }
 
   /**
@@ -94,7 +119,7 @@ class RedisCacheDriver implements BaseCacheDriver {
    * If key is not in cache, returns null.
    * If key is in cache and outdated, return null and key and its value will be removed.
    */
-  dynamic operator[](String key) {
+  Future<dynamic> operator[](String key) {
     throw new UnimplementedError();
   }
 
@@ -116,8 +141,10 @@ class RedisCacheDriver implements BaseCacheDriver {
   /**
    * Clear cache. While running, Driver acquires internal cache lock and pauses threads.
    */
-  void emptify() {
-    throw new UnimplementedError();
+  Future emptify() async {
+    _redisMultiCommander([
+      ["LTRIM", ]
+      ]);
   }
 
   /**
@@ -131,7 +158,7 @@ class RedisCacheDriver implements BaseCacheDriver {
   /**
    * Check whether backbone is healthy and can interact.
    */
-  bool checkBackbone() {
+  Future<bool> checkBackbone() async {
     throw new UnimplementedError();
   }
 
@@ -139,7 +166,7 @@ class RedisCacheDriver implements BaseCacheDriver {
    * Recover backbone from malfunctioning like disconnection.
    * While running, Driver acquires internal cache lock and pauses threads.
    */
-  bool recoverBackbone() {
+  Future<bool> recoverBackbone() async {
     throw new UnimplementedError();
   }
 }
