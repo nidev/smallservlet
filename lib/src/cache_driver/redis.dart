@@ -7,7 +7,6 @@ const String REDIS_INDEX_SUFFIX = ":L";
 const String REDIS_HASH_SUFFIX = ":H";
 
 class RedisCacheDriver implements BaseCacheDriver {
-  RedisConnection _redis;
   Function _redisCommander;
   Function _redisMultiCommander;
   int _lifetimeSeconds = 120;
@@ -110,8 +109,9 @@ class RedisCacheDriver implements BaseCacheDriver {
   /**
    * Check whether cache already knows the key and confirms its valid lifetime.
    */
-  Future<bool> hasValue(String key) {
-    int found = _redisCommander(["Z"]);
+  Future<bool> hasValue(String key) async {
+    int numberOfItems = await _redisCommander(["SISMEMBER", _redisIndexKey, "MATCH", key]);
+    return new Future<bool>.value(numberOfItems > 0);
   }
 
   /**
@@ -119,15 +119,23 @@ class RedisCacheDriver implements BaseCacheDriver {
    * If key is not in cache, returns null.
    * If key is in cache and outdated, return null and key and its value will be removed.
    */
-  Future<dynamic> operator[](String key) {
-    throw new UnimplementedError();
+  Future<dynamic> operator[](String key) async {
+    bool keyAvailable = await hasValue(key);
+    if (keyAvailable) {
+      return _redisCommander(["HGET", _redisHashKey, key]);
+    }
+
+    return new Future<Null>.value(null);
   }
 
   /**
    * Set value to cache. If cache has already same key and key is still valid, no overwriting/updating occurs.
    */
   void operator[]=(String key, dynamic value) {
-    throw new UnimplementedError();
+    _redisMultiCommander([
+      ["SADD", _redisIndexKey, key],
+      ["HSET", _redisHashKey, key, value.toString()]
+    ]);
   }
 
   /**
@@ -141,10 +149,10 @@ class RedisCacheDriver implements BaseCacheDriver {
   /**
    * Clear cache. While running, Driver acquires internal cache lock and pauses threads.
    */
-  Future emptify() async {
-    _redisMultiCommander([
-      ["LTRIM", ]
-      ]);
+  Future<Null> emptify() async {
+    await _redisMultiCommander([
+      ["DEL", _redisIndexKey],
+      ["DEL", _redisHashKey]]);
   }
 
   /**
@@ -152,14 +160,15 @@ class RedisCacheDriver implements BaseCacheDriver {
    * databases like sqlite, Key-value storage like Redis.
    */
   bool hasBackbone() {
-    throw new UnimplementedError();
+    return true;
   }
 
   /**
    * Check whether backbone is healthy and can interact.
    */
   Future<bool> checkBackbone() async {
-    throw new UnimplementedError();
+    String response = await _redisCommander(["PING"]);
+    return new Future<bool>.value(response == "PONG");
   }
 
   /**
@@ -167,6 +176,13 @@ class RedisCacheDriver implements BaseCacheDriver {
    * While running, Driver acquires internal cache lock and pauses threads.
    */
   Future<bool> recoverBackbone() async {
-    throw new UnimplementedError();
+    // TODO: connection closes right after every command is done. Do I have to remove this interface?
+    try {
+      String response = await _redisCommander(["PING"]);
+      return new Future<bool>.value(response == "PONG");
+    }
+    catch (e) {
+      return new Future<bool>.value(false);
+    }
   }
 }

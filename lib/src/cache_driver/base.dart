@@ -57,7 +57,7 @@ abstract class BaseCacheDriver {
   /**
    * Clear cache. While running, Driver acquires internal cache lock and pauses threads.
    */
-  Future emptify();
+  Future<Null> emptify();
 
   /**
    * Return whether this driver utilizes external softwares. Softwares can be
