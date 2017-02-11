@@ -8,10 +8,6 @@ void main(List<String> arguments) {
   redisCacheDriver = new RedisCacheDriver(redisKey: "default_spec_test");
   
   group("RedisCacheDriver default specifications test", () {
-    setUp(() {
-      
-    });
-
     test("Has default cache size",
       () => expect(redisCacheDriver.getCacheSize(), greaterThan(0)));
 
@@ -24,11 +20,13 @@ void main(List<String> arguments) {
     test("Can check cache backbone health",
       () => expect(redisCacheDriver.checkBackbone(), completion(equals(true))));
 
-    test("Can recover cache backbone from failure",
-      () => expect(redisCacheDriver.recoverBackbone(), completion(equals(true))));
+    test("Can recover cache backbone from failure", () {
+      expect(redisCacheDriver.checkBackbone(), completion(equals(true)));
+      expect(redisCacheDriver.recoverBackbone(), completion(equals(true)));
+    });
     
-    tearDown(() {
-
+    tearDown(() async {
+      await redisCacheDriver.recoverBackbone();
     });
   });
 }
