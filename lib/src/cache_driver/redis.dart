@@ -2,11 +2,15 @@
 import "dart:async";
 import "package:redis/redis.dart";
 import "package:smallservlet/src/cache_driver/base.dart";
+import "package:smallservlet/src/logger.dart";
 
+const String TAG = "RedisCacheDriver";
 const String REDIS_INDEX_SUFFIX = ":L";
 const String REDIS_HASH_SUFFIX = ":H";
 
 class RedisCacheDriver implements BaseCacheDriver {
+  RedisConnection _redis;
+  Command _command;
   Function _redisCommander;
   Function _redisMultiCommander;
   int _lifetimeSeconds = 120;
@@ -29,36 +33,40 @@ class RedisCacheDriver implements BaseCacheDriver {
     _redisKey = redisKey;
 
     // Construct Commander closure
-    _redisCommander = (redisCommand) async {
-      Command command = await _redis.connect(host, port);
+    _redisCommander = (redisQuery) async {
+      if (_command == null) {
+        _command = await _redis.connect(host, port);
+      }
 
       String authenticate = "OK";
       if (password.isNotEmpty) {
-        authenticate = await command.send_object(["AUTH", password]);
+        authenticate = await _command.send_object(["AUTH", password]);
       }
 
       if (authenticate == "OK") {
-        return command.send_object(redisCommand);
+        return _command.send_object(redisQuery);
       }
       else {
         throw new Exception("Incorrect password. Redis access is unauthorized.");
       }
     };
 
-    _redisMultiCommander = (List<List<String>> redisCommands) async {
-      Command command = await _redis.connect(host, port);
+    _redisMultiCommander = (List<List<String>> redisQueries) async {
+      if (_command == null) {
+        _command = await _redis.connect(host, port);
+      }
 
       String authenticate = "OK";
       if (password.isNotEmpty) {
-        authenticate = await command.send_object(["AUTH", password]);
+        authenticate = await _command.send_object(["AUTH", password]);
       }
 
       if (authenticate == "OK") {
-        return command.multi().then((Transaction t) {
+        return _command.multi().then((Transaction t) {
           t.pipe_start();
           
-          redisCommands.forEach((redisCommand) {
-            t.send_object(redisCommand);
+          redisQueries.forEach((query) {
+            t.send_object(query);
           });
 
           t.pipe_end();
@@ -176,13 +184,30 @@ class RedisCacheDriver implements BaseCacheDriver {
    * While running, Driver acquires internal cache lock and pauses threads.
    */
   Future<bool> recoverBackbone() async {
-    // TODO: connection closes right after every command is done. Do I have to remove this interface?
+    Logger log = new Logger(TAG);
+
     try {
-      String response = await _redisCommander(["PING"]);
-      return new Future<bool>.value(response == "PONG");
+      if (_redis != null && _command != null) {
+        log.d("Destroy previous connection");
+        await _redis.close();
+        _redis = null;
+        _command = null;
+
+        log.d("New RedisConnection is created. Actual connection will be made on sending command");
+        _redis = new RedisConnection();
+      }
+      else {
+        log.d("RedisConnection has not been made before and reconnection is skipped");
+      }
+
+      return new Future<bool>.value(true);
     }
     catch (e) {
-      return new Future<bool>.value(false);
+      log.e("------------- recover backbone failed --------------");
+      log.e(e);
+      log.e("----------------------------------------------------");
     }
+
+    return new Future<bool>.value(false);
   }
 }
