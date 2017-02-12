@@ -44,9 +44,17 @@ abstract class BaseCacheDriver {
   Future<dynamic> operator[](String key);
 
   /**
-   * Set value to cache. If cache has already same key and key is still valid, no overwriting/updating occurs.
+   * Short-hand of storeAsync(key, value). only supports synchronous operation.
+   * Due to limitation of Dart specification, you are discouraged to implement this.
+   * (Just throwing an exception would be better)
    */
   void operator[]=(String key, dynamic value);
+
+  /**
+   * Set value to cache. If cache has already same key and key is still valid, no overwriting/updating occurs.
+   * Asynchronous version of operator[]=, due to limitation of Dart specification.
+   */
+  Future<Null> store(String key, dynamic value);
   
   /**
    * Compress cache immediately.

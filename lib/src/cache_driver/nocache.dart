@@ -56,9 +56,21 @@ class NoCacheDriver implements BaseCacheDriver {
 
   /**
    * Set value to cache. If cache has already same key and key is still valid, no overwriting/updating occurs.
+   * 
+   * No operation is made. That is, store()/operator[]= do same action - no-op.
    */
   void operator[]=(String key, dynamic value) {
     ;
+  }
+
+  /**
+   * Set value to cache. If cache has already same key and key is still valid, no overwriting/updating occurs.
+   * Asynchronous version of operator[]=, due to limitation of Dart specification.
+   * 
+   * No operation is made. That is, store()/operator[]= do same action - no-op.
+   */
+  Future<Null> store(String key, dynamic value) {
+    return null;
   }
 
   /**
