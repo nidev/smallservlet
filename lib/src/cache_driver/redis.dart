@@ -63,14 +63,11 @@ class RedisCacheDriver implements BaseCacheDriver {
 
       if (authenticate == "OK") {
         return _command.multi().then((Transaction t) {
-          t.pipe_start();
-          
           redisQueries.forEach((query) {
+            print("Execute ${query.join(' ')}");
             t.send_object(query);
           });
-
-          t.pipe_end();
-          return t.exec();
+          t.exec();
         });
       }
       else {
@@ -90,6 +87,9 @@ class RedisCacheDriver implements BaseCacheDriver {
    * Set cache size in the number of Key-Value items
    */
   void setCacheSize(int size) {
+    if (size < 0) {
+      throw new Exception("Cache size can not be negative integer");
+    }
     _cacheSize = size;
   }
 
@@ -111,6 +111,9 @@ class RedisCacheDriver implements BaseCacheDriver {
    * Set lifetime length in second
    */
   void setLifetimeSeconds(int seconds) {
+    if (seconds < 0) {
+      throw new Exception("Lifetime can not be negative integer");
+    }
     _lifetimeSeconds = seconds;
   }
 
@@ -118,8 +121,15 @@ class RedisCacheDriver implements BaseCacheDriver {
    * Check whether cache already knows the key and confirms its valid lifetime.
    */
   Future<bool> hasValue(String key) async {
-    int numberOfItems = await _redisCommander(["SISMEMBER", _redisIndexKey, "MATCH", key]);
-    return new Future<bool>.value(numberOfItems > 0);
+    dynamic response = await _redisCommander(["SISMEMBER", _redisIndexKey, key]);
+    if (response is int) {
+      return new Future<bool>.value(response == 1);
+    }
+    
+    Logger log = new Logger(TAG);
+    log.w("Unexpected value from _redisCommander:SISMEMBER, ${response.toString()}");
+
+    return new Future<bool>.value(false);
   }
 
   /**
@@ -138,12 +148,29 @@ class RedisCacheDriver implements BaseCacheDriver {
 
   /**
    * Set value to cache. If cache has already same key and key is still valid, no overwriting/updating occurs.
+   * This operation does not support async/await.
+   * Thus, If in bad case, Acquiring goes first before storing made by this operation. That is cache miss.
+   * 
+   * You're discouraged to call this unless you know what you do. Instead, use store(key, value).
    */
   void operator[]=(String key, dynamic value) {
-    _redisMultiCommander([
+    Logger log = new Logger(TAG);
+    log.w("Calling asynchronous function from synchronous function without await.");
+    log.w("Avoid calling operator []=, instead use store(key, value)");
+
+    store(key, value);
+  }
+
+  /**
+   * Set value to cache. If cache has already same key and key is still valid, no overwriting/updating occurs.
+   */
+  Future<Null> store(String key, dynamic value) async {
+    await _redisMultiCommander([
       ["SADD", _redisIndexKey, key],
       ["HSET", _redisHashKey, key, value.toString()]
     ]);
+
+    return new Future<Null>.value(null);
   }
 
   /**
