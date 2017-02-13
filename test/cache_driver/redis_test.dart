@@ -51,14 +51,29 @@ void main(List<String> arguments) {
   });
 
   group("'Basic cache function' test", () {
+    const List<String> paths = const [
+      "/user",
+      "/user/1",
+      "/user/1?test=1"
+    ];
+
     setUp(() async {
       await redisCacheDriver.checkBackbone();
     });
 
     test("Tries to save an item", () async {
-      // XXX: operator[] is not an async/await function. There is a possibility of cache miss
-      await redisCacheDriver.store("fireball", "1");
-      expect(redisCacheDriver.hasValue("fireball"), completion(equals(true)));
+      await redisCacheDriver.store(paths[0], "1");
+      expect(await redisCacheDriver.hasValue(paths[0]), equals(true));
+    });
+
+    test("Tries to save multiple items", () async {
+      paths.forEach((path) async {
+        await redisCacheDriver.store(path, "1");
+      });
+
+      paths.forEach((path) async {
+        expect(await redisCacheDriver.hasValue(path), equals(true));
+      });
     });
 
     tearDown(() async {
