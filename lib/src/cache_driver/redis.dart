@@ -52,23 +52,30 @@ class RedisCacheDriver implements BaseCacheDriver {
     };
 
     _redisMultiCommander = (List<List<String>> redisQueries) async {
-      if (_command == null) {
-        _command = await _redis.connect(host, port);
-      }
+      // Utilize new socket,
+      // because transaction can be interrupted,
+      // when other async blocks get chance to run _redisCommander
+      RedisConnection trConn = new RedisConnection();
+      Command trCommand = await trConn.connect(host, port);
 
       String authenticate = "OK";
       if (password.isNotEmpty) {
-        authenticate = await _command.send_object(["AUTH", password]);
+        authenticate = await trCommand.send_object(["AUTH", password]);
       }
 
       if (authenticate == "OK") {
-        return _command.multi().then((Transaction t) {
-          redisQueries.forEach((query) {
-            print("Execute ${query.join(' ')}");
-            t.send_object(query);
-          });
-          t.exec();
+        // TODO: Exception handling
+        Transaction t = await trCommand.multi();
+        redisQueries.forEach((query) {
+          print("Execute ${query.join(' ')}");
+          t.send_object(query);
         });
+        
+        // I hate to declare type 'dynamic', but.
+        dynamic trResult = await t.exec();
+        await trConn.close();
+
+        return new Future<dynamic>.value(trResult);
       }
       else {
         throw new Exception("Incorrect password. Redis access is unauthorized.");
@@ -165,7 +172,7 @@ class RedisCacheDriver implements BaseCacheDriver {
    * Set value to cache. If cache has already same key and key is still valid, no overwriting/updating occurs.
    */
   Future<Null> store(String key, dynamic value) async {
-    await _redisMultiCommander([
+    _redisMultiCommander([
       ["SADD", _redisIndexKey, key],
       ["HSET", _redisHashKey, key, value.toString()]
     ]);
