@@ -172,7 +172,7 @@ class RedisCacheDriver implements BaseCacheDriver {
    * Set value to cache. If cache has already same key and key is still valid, no overwriting/updating occurs.
    */
   Future<Null> store(String key, dynamic value) async {
-    _redisMultiCommander([
+    await _redisMultiCommander([
       ["SADD", _redisIndexKey, key],
       ["HSET", _redisHashKey, key, value.toString()]
     ]);
