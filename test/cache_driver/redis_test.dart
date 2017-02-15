@@ -1,4 +1,5 @@
 @TestOn("vm")
+import "dart:async";
 import "package:test/test.dart";
 import "package:smallservlet/src/cache_driver/redis.dart";
 
@@ -67,9 +68,15 @@ void main(List<String> arguments) {
     });
 
     test("Tries to save multiple items", () async {
-      paths.forEach((path) async {
-        await redisCacheDriver.store(path, "1");
+      List<Future> storingTasks = new List<Future>();
+      
+      // Enqueuing Futures that request storing an item
+      paths.forEach((path) {
+        storingTasks.add(redisCacheDriver.store(path, "1"));
       });
+
+      // Waiting for everything is done before check phrases.
+      await Future.wait(storingTasks);
 
       paths.forEach((path) async {
         expect(await redisCacheDriver.hasValue(path), equals(true));
