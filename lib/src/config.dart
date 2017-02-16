@@ -78,14 +78,14 @@ class SSConfiguration {
 
     ConfigurationKeys.forEach((key) {
       if (!map.containsKey(key)) {
-        log.w("Missing required key: #{key}");
+        log.w("Missing required key: ${key}");
         insufficients.add(key);
       }
     });
 
     map.keys.forEach((key) {
       if (!ConfigurationKeys.contains(key)) {
-        log.w("Unused key: #{key}");
+        log.w("Unused key: ${key}");
         unused_keys.add(key);
       }
     });
