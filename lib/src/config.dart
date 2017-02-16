@@ -14,7 +14,7 @@ const String CFG_REDIS__HOST = "redis.host";
 const String CFG_REDIS__PORT = "redis.port";
 const String CFG_REDIS__KEY = "redis.key";
 const String CFG_REDIS__PASSWORD = "redis.password";
-const String CFG_LOGLEVEL = "loglevel";
+const String CFG_LOGLEVELS = "loglevels";
 const String CFG_MAX_CONNECTION = "max_connection";
 const String CFG_ROOTDIR = "rootdir";
 
@@ -27,7 +27,7 @@ const List<String> ConfigurationKeys = const [
   CFG_REDIS__PORT,
   CFG_REDIS__PASSWORD,
   CFG_REDIS__KEY,
-  CFG_LOGLEVEL,
+  CFG_LOGLEVELS,
   CFG_MAX_CONNECTION,
   CFG_ROOTDIR
 ];

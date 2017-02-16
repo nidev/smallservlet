@@ -16,7 +16,7 @@
   "redis.key": "",
   "comment ^": "Set cache key name for Redis. ':H' is automatically appended on creating Hash key, ':L' on creating List key",
   "loglevel": "",
-  "comment ^": "Set log level. (0: Error only, 1: Error, Warn 2: Error, Warn, Notify, 3: All - default)",
+  "comment ^": "Set accepted log levels in comma-separated string (debug, notify, error, warn)",
   "max_connection": "",
   "comment ^": "Maximum number of accepting connections. It depends on your kernel settings",
   "rootdir": "",

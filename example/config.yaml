@@ -14,7 +14,7 @@ redis.port:
 redis.password:
 # Set cache key name for Redis. ':H' is automatically appended on creating Hash key, ':L' on creating List key
 redis.key:
-# Set log level. (0: Error only, 1: Error, Warn 2: Error, Warn, Notify, 3: All - default)
+# Set accepted log levels in comma-separated string (debug, notify, error, warn)
 loglevel:
 # Maximum number of accepting connections. It depends on your kernel settings
 max_connection:
