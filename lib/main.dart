@@ -16,6 +16,7 @@ const String TAG = "Main";
 
 void bootstrap(List<String> arguments) {
   final log = new Logger("Main");
+  
   final appVersion = getPackageVersion();
 
   log.n("Boot up SmallServlet ${appVersion.toString()}");
@@ -42,8 +43,35 @@ void bootstrap(List<String> arguments) {
   final SSConfiguration config = new SSConfiguration.fromFile("", configFilePath);
   log.n("Load configuration");
 
+  String logLevelsString = config[CFG_LOGLEVELS];
+  List<String> logLevels = logLevelsString.trim().split(",");
+  if (logLevels.length <= 0) {
+    log.n("No configuration for log levels. For default, every level is enabled (aka verbose)");
+  }
+  else {
+    log.n("Reset log level");
+    Logger.logLevels.clear();
+
+    logLevels.forEach((lv) {
+      lv = lv.trim();
+
+      if (LOG_LEVELS_FROM_STRING.containsKey(lv)) {
+        Logger.logLevels.add(LOG_LEVELS_FROM_STRING[lv]);
+      }
+      else {
+        // Re-enable error level, and display error message
+        Logger.logLevels.add(LOG_LEVELS.ERROR);
+        log.e("Given log level name '${lv}' is invalid one. Should be one of debug, notify, warn or error");
+        exit(1);
+      }
+    });
+  }
+
+  log.n("Global log levels: ${Logger.logLevels.toString()}");
+
   Cache.BaseCacheDriver cacheDriver = new Cache.NoCacheDriver();
   if (config[CFG_CACHE__SIZE] > 0) {
+    log.d("Cache size is bigger than zero, initiate Redis cache.");
     cacheDriver = new Cache.RedisCacheDriver(
       host: config[CFG_REDIS__HOST],
       port: config[CFG_REDIS__PORT],
