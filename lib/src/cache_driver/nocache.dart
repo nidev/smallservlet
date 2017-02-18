@@ -41,7 +41,7 @@ class NoCacheDriver implements BaseCacheDriver {
   /**
    * Check whether cache already knows the key and confirms its valid lifetime.
    */
-  Future<bool> hasValue(String key) async {
+  Future<bool> hasKey(String key) async {
     return new Future<bool>.value(false);
   }
 

@@ -34,7 +34,7 @@ abstract class BaseCacheDriver {
   /**
    * Check whether cache already knows the key and confirms its valid lifetime.
    */
-  Future<bool> hasValue(String key);
+  Future<bool> hasKey(String key);
 
   /**
    * Get value from cache. This may return number type value or String type value.

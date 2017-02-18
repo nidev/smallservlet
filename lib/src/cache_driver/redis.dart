@@ -127,7 +127,7 @@ class RedisCacheDriver implements BaseCacheDriver {
   /**
    * Check whether cache already knows the key and confirms its valid lifetime.
    */
-  Future<bool> hasValue(String key) async {
+  Future<bool> hasKey(String key) async {
     dynamic response = await _redisCommander(["SISMEMBER", _redisIndexKey, key]);
     if (response is int) {
       return new Future<bool>.value(response == 1);
@@ -145,7 +145,7 @@ class RedisCacheDriver implements BaseCacheDriver {
    * If key is in cache and outdated, return null and key and its value will be removed.
    */
   Future<dynamic> operator[](String key) async {
-    bool keyAvailable = await hasValue(key);
+    bool keyAvailable = await hasKey(key);
     if (keyAvailable) {
       return _redisCommander(["HGET", _redisHashKey, key]);
     }
