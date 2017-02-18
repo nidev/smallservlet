@@ -1,6 +1,7 @@
 import "dart:convert";
 import "dart:io";
 import "dart:async";
+import "package:smallservlet/src/platform_util.dart";
 import "package:smallservlet/src/logger.dart";
 import "package:yaml/yaml.dart" as Yaml;
 import "package:path/path.dart" as Path;
@@ -114,8 +115,7 @@ class SSConfiguration {
 
     JsonEncoder encoder = new JsonEncoder.withIndent("  ", (unencodable) => "");
 
-    // TODO: Line separator issue(CR_LF vs LF vs CR)
-    String serialized = encoder.convert(_configMap);
+    String serialized = encoder.convert(_configMap).replaceAll("\n", PlatformUtil.newLine);
 
     return targetFile.writeAsString(serialized,
       mode: FileMode.WRITE,
@@ -130,11 +130,11 @@ class SSConfiguration {
     if (await targetFile.exists()) {
       log.w("File exists. Writing configuration will overwrite the file: ${filename}");
     }
-    // TODO: Is there an well-made serializer?
-    // TODO: Line separator issue(CR_LF vs LF vs CR)
+
     StringBuffer stringBuffer = new StringBuffer();
     _configMap.forEach((key, value) {
-      stringBuffer.writeln("${key}: ${value.toString()}");
+      stringBuffer.write("${key}: ${value.toString()}");
+      stringBuffer.write(PlatformUtil.newLine);
     });
 
     return targetFile.writeAsString(stringBuffer.toString(),
