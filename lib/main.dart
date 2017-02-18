@@ -90,23 +90,12 @@ void bootstrap(List<String> arguments) {
     ..setCacheDriver(cacheDriver);
   log.n("Initiate servlet engine");
 
-  servletEngine.testOperationOnce(parsed.wasParsed("dry") && parsed["dry"])
-    .then((realServletEngine) async => await realServletEngine.doServe())
-    .catchError((e) {
-      log.e("Exception occured : ${e}");
-    })
-    .whenComplete(() {
-      try {
-        servletEngine.haltGracefully();
-      }
-      on Exception catch (e, s) {
-        log.e("SmallServlet could not halt service gracefully.");
-        log.e("Your configuration, runtime or OS may have serious problem.");
-        log.e("Please check everything around SmallServlet");
-        log.e("Exception : ${e}");
-        log.e("Stack Trace : ${s}");
-
-        servletEngine.haltEmergency();
-      }
-    });
+  if (parsed.wasParsed("dry") && parsed["dry"]) {
+    log.n("Engine ignition with Dry mode");
+    servletEngine.safeIgnition(() async => await servletEngine.doServe());
+  }
+  else {
+    log.n("Engine ignition with real mode");
+    servletEngine.safeIgnition(() async => await servletEngine.doServe());
+  }
 }
