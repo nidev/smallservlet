@@ -4,5 +4,6 @@ dependencies:
   redis: 0.4.5
   path: ^1.4.0
   yaml: ^2.1.12
+  system_info: 0.0.16
 dev_dependencies:
   test: ">=0.12.18"
