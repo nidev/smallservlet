@@ -1,21 +1,31 @@
 // encoding: utf-8
 import "dart:io";
 import "dart:async";
+import "package:system_info/system_info.dart";
+import "package:path/path.dart" as Path;
 import "package:smallservlet/src/logger.dart";
 import "package:smallservlet/src/cache_driver/base.dart";
 
 const String TAG = "Servlet";
+enum PathKey { TEMP_DIR, SERVLET_DIR, CONTEXT_FILE }
+const Map<PathKey, String> SSPATH = const {
+  PathKey.TEMP_DIR: "tempdir",
+  PathKey.SERVLET_DIR: "servlet",
+  PathKey.CONTEXT_FILE: ".context"
+};
 
 class ServletEngine {
   BaseCacheDriver _cache;
   int _maxConnection = 0;
   dynamic _SVhost = InternetAddress.ANY_IP_V6 ;
+  String _rootdir = "/var/lib/smallservlet/";
   int _SVport;
 
 
   ServletEngine(dynamic host, int port, String rootdir) {
     _SVhost = host;
     _SVport = port;
+    _rootdir = rootdir.trim();
   }
 
   void setMaxConnection(int max_num) {
@@ -43,32 +53,60 @@ class ServletEngine {
     
     flightCheck.add(new Future(() {
       log.n("Operation Test: Run as non-root user");
-      // TODO: Real code
+      
+      if (SysInfo.userName == "root" || SysInfo.userId == "root") {
+        log.e("You SHOULD NOT run this program as root user.");
+        throw new Exception("Run as non-root user");
+      }
+    }));
+
+    flightCheck.add(new Future(() {
+      log.n("Operation Test: Root dir folder structure and Read/Write");
+
+      if (!Path.isAbsolute(_rootdir)) {
+        throw new Exception("Path to rootdir should be an absolute path.");
+      }
+
+      Directory rootDir = new Directory(_rootdir);
+      if (rootDir.existsSync()) {
+        SSPATH.values.forEach((directory) {
+          Directory subDir = new Directory(Path.join(_rootdir, directory));
+          subDir.createSync();
+        });
+      }
+      else {
+        throw new Exception("Rootdir path [${_rootdir}] does not exist.");
+      }
     }));
 
     flightCheck.add(new Future(() {
       log.n("Operation Test: Temporary dir Read/Write");
       // TODO: Real code
+      throw new UnimplementedError();
     }));
 
     flightCheck.add(new Future(() {
       log.n("Operation Test: Port availability");
       // TODO: Real code
+      throw new UnimplementedError();
     }));
 
     flightCheck.add(new Future(() {
       log.n("Operation Test: Cache readiness");
       // TODO: Real code
+      throw new UnimplementedError();
     }));
 
     flightCheck.add(new Future(() {
       log.n("Operation Test: Dart Isolation test");
       // TODO: Real code
+      throw new UnimplementedError();
     }));
 
     flightCheck.add(new Future(() {
       log.n("Operation Test: Run as non-root user");
       // TODO: Real code
+      throw new UnimplementedError();
     }));
 
     Future.wait(flightCheck)
