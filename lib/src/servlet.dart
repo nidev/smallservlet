@@ -104,7 +104,7 @@ class ServletEngine {
     }));
 
     flightCheck.add(new Future(() {
-      log.n("Operation Test: Run as non-root user");
+      log.n("Operation Test: Run test isolation");
       // TODO: Real code
       throw new UnimplementedError();
     }));
@@ -142,11 +142,32 @@ class ServletEngine {
 
   void haltGracefully() {
     Logger log = new Logger(TAG);
-    throw new UnimplementedError();
+
+    Logger.logLevels.add(LOG_LEVELS.NOTIFY);
+    log.n("Gracefully halt SmallServlet...");
+
+    _cache.syncBackbone(false).then((result) => log.n("Sync cache : ${result}"));
+
+    // TODO: any servlet clean-up, releasing file handles
+
+    // When everything is done
+    log.n("Halted");
+    exit(0);
   }
 
   void haltEmergency() {
-    Logger log = new Logger(TAG);
-    throw new UnimplementedError();
+    final String EmergencyTAG = "EMERGENCY";
+    
+    // Enable all level
+    Logger log = new Logger(EmergencyTAG);
+    Logger.logLevels.addAll(LOG_LEVELS.values);
+
+    log.e("!!! EMERGENCY HALT !!!");
+    
+    _cache.syncBackbone(true).then((result) => log.n("Sync cache : ${result}"));
+    
+    // TODO: any servlet clean-up, releasing file handles
+
+    exit(-1);
   }
 }
