@@ -110,4 +110,13 @@ class NoCacheDriver implements BaseCacheDriver {
   Future<bool> recoverBackbone() async {
     return new Future<bool>.value(false);
   }
+
+  /**
+   * Send request to synchronization for backbone. For instance, requesting sync on in-memory cache may trigger creating disk snapshot(s).
+   * 
+   * Nothing is done for NoCacheDriver. Future which is returned from this function always returns true.
+   */
+  Future<bool> syncBackbone(bool immediate) {
+    return new Future<bool>.value(true);
+  }
 }

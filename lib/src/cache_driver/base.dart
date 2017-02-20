@@ -83,4 +83,13 @@ abstract class BaseCacheDriver {
    * While running, Driver acquires internal cache lock and pauses threads.
    */
   Future<bool> recoverBackbone();
+
+  /**
+   * Send request to synchronization for backbone. For instance, requesting sync on in-memory cache may trigger creating disk snapshot(s).
+   * 
+   * This will return Future<bool> for returning synchronization status. Future will have 'true' in most cases.
+   * However, if this function is called in case of emergency halting, there is no 100% sure that all cached data are kept in non-volatile media.
+   * Driver should implement this function in the safest way.
+   */
+  Future<bool> syncBackbone(bool immediate);
 }

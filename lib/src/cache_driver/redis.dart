@@ -244,4 +244,28 @@ class RedisCacheDriver implements BaseCacheDriver {
 
     return new Future<bool>.value(false);
   }
+
+  /**
+   * Send request to synchronization for backbone. For instance, requesting sync on Redis may trigger creating disk snapshot(s).
+   * 
+   * This will return Future<bool> for returning synchronization status. Future will have 'true' in most cases.
+   * However, if this function is called in case of emergency halting, there is no 100% sure that all cached data are kept in non-volatile media.
+   * Driver should implement this function in the safest way.
+   */
+  Future<bool> syncBackbone(bool immediate) async {
+    String response = null;
+
+    if (immediate) {
+      response = await _redisCommander(["SAVE"]);
+    }
+    else {
+      response = await _redisCommander(["BGSAVE"]);
+    } 
+    
+    if (response == "OK") {
+      return new Future<bool>.value(true);
+    }
+
+    return new Future<bool>.value(false);
+  }
 }
