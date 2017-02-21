@@ -77,25 +77,18 @@ class ServletEngine {
       else {
         throw new Exception("Rootdir path [${_rootdir}] does not exist.");
       }
-    }));
 
-    flightCheck.add(new Future(() {
       log.n("Operation Test: Temporary dir Read/Write");
-      // TODO: Real code
-      throw new UnimplementedError();
+      File tempFile = new File(Path.join(_rootdir, SSPATH[PathKey.TEMP_DIR], "io_test"));
+      tempFile.createSync();
+      tempFile.writeAsBytesSync([0], mode: FileMode.WRITE, flush: true);
     }));
 
-    flightCheck.add(new Future(() {
-      log.n("Operation Test: Port availability");
-      // TODO: Real code
-      throw new UnimplementedError();
-    }));
+    log.n("Operation Test: Port availability");
+    flightCheck.add(ServerSocket.bind(_SVhost, _SVport).then((socket)=>socket.close()));
 
-    flightCheck.add(new Future(() {
-      log.n("Operation Test: Cache readiness");
-      // TODO: Real code
-      throw new UnimplementedError();
-    }));
+    log.n("Operation Test: Cache readiness");
+    flightCheck.add(_cache.checkBackbone());
 
     flightCheck.add(new Future(() {
       log.n("Operation Test: Dart Isolation test");
