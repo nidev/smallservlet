@@ -92,10 +92,10 @@ void bootstrap(List<String> arguments) {
 
   if (parsed.wasParsed("dry") && parsed["dry"]) {
     log.n("Engine ignition with Dry mode");
-    servletEngine.safeIgnition(() async => await servletEngine.doServe());
+    servletEngine.safeIgnition(() => servletEngine.doServe());
   }
   else {
     log.n("Engine ignition with real mode");
-    servletEngine.safeIgnition(() async => await servletEngine.doServe());
+    servletEngine.safeIgnition(() => servletEngine.doServe());
   }
 }

@@ -93,25 +93,29 @@ class ServletEngine {
     flightCheck.add(new Future(() {
       log.n("Operation Test: Dart Isolation test");
       // TODO: Real code
-      throw new UnimplementedError();
+      //throw new UnimplementedError();
     }));
 
     flightCheck.add(new Future(() {
       log.n("Operation Test: Run test isolation");
       // TODO: Real code
-      throw new UnimplementedError();
+      //throw new UnimplementedError();
     }));
 
     Future.wait(flightCheck)
-      .then((any) {
+      .then((any) async {
         log.n("Operation Test has finished. Ignite engine!");
-        igniter();
+
+        await igniter();
+        
+        log.n("Operation ends.");
       })
       .catchError((e) {
         log.e("Exception occured : ${e}");
       })
       .whenComplete(() {
         try {
+          log.n("Clean up");
           haltGracefully();
         }
         on Exception catch (e, s) {
@@ -127,10 +131,31 @@ class ServletEngine {
   }
 
   Future<bool> doServe() async {
+    final Completer c = new Completer();
+
     // TODO: Support secure protocol 
     Logger log = new Logger(TAG);
-    throw new UnimplementedError();
-    return true;
+    HttpServer httpServer = await HttpServer.bind(_SVhost, _SVport);
+    
+    // Connection monitor timer
+    Timer monitor = new Timer.periodic(new Duration(seconds: 5), (_) {
+      HttpConnectionsInfo connInfo = httpServer.connectionsInfo();
+      log.n("Connections[${connInfo.total}]: active[${connInfo.active}] idle[${connInfo.idle}] closing[${connInfo.closing}]");
+    });
+    
+    httpServer.listen((request) {
+        log.d("Connection from [${request.connectionInfo.remoteAddress.toString()}] at [${request.connectionInfo.remotePort}]");
+        request.response.writeln("Hello World!");
+        request.response.close();
+
+        // TODO: Just for now. Signal handler is required.
+        c.complete(true);
+      },
+      onError: (e) {
+        log.e("Error occured: ${e}");
+      }
+    );
+    return c.future;
   }
 
   void haltGracefully() {
