@@ -102,6 +102,12 @@ class ServletEngine {
       //throw new UnimplementedError();
     }));
 
+    flightCheck.add(new Future(() {
+      log.n("Scan rootdir and create routing table");
+      // TODO: Real code
+      throw new UnimplementedError();
+    }));
+
     Future.wait(flightCheck)
       .then((any) async {
         log.n("Operation Test has finished. Ignite engine!");
