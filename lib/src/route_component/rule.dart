@@ -8,12 +8,12 @@ enum METHODS { GET, POST, PUT, DELETE }
  * URL Route rule class
  */
 class Rule {
-  ROUTE_COMMAND _doRoute;
-  Set<METHODS> _onMethods;
-  String _pattern;
-  String _nextRoute;
+  final ROUTE_COMMAND command;
+  final Set<METHODS> acceptedMethods;
+  final String pattern;
+  final String nextRoute;
 
-  Rule(this._doRoute, this._pattern, this._onMethods);
+  Rule(this.command, this.acceptedMethods, this.pattern, this.nextRoute);
 
 
   String onRedirect(HttpRequest req, HttpResponse res) {
