@@ -31,7 +31,67 @@ class URLPattern {
     throw new UnimplementedError();
   }
 
-  URLPattern.compileFromString(String pattern) {
+  URLPattern.compileFrom(String patternString, String urlPath) {
+    var patternTokens = patternString.trim().split("/");
+    var pathTokens = urlPath.trim().split("/");
+    var rebuiltPath = <String>[];
+    var rebuiltParam = <String, String>{};
+    var foundAsteriskOnce = false;
+
+    if (!patternString.startsWith("/") || !urlPath.startsWith("/")) {
+      if (patternString == "*") {
+        rebuiltPath.add(patternString);
+        foundAsteriskOnce = true;
+        // TODO: Create Rule object
+        return; // Compile finished: asterisk
+      }
+      else {
+        throw new Exception("Pattern/Path must start with forward slash (/)");
+      }
+    }
+
+    if (patternTokens.length != pathTokens.length) {
+      throw new Exception("Pattern can not be matched with given path. (Pattern tokens:${patternTokens.length}, given URL tokens: ${pathTokens.length})");
+    }
+    
+    for (var index = 0; index < patternTokens.length; index++) {
+      var pattern = patternTokens[index];
+      var item = urlPath[index];
+
+      if (pattern.startsWith("{")) {
+        // validating closing curly bracket
+        if (!pattern.endsWith("}")) {
+          throw new Exception("Enclose template brackets correctly. ($pt)");
+        }
+
+        // last added path is a Dart servlet. This will conclude accpeting servlet path.
+        
+      }
+      else {
+        // detecting dangling brackets
+        if (pattern.allMatches("[\{\}]")) {
+          throw new Exception("Incomplete template bracket(s) are found. ($pt)");
+        }
+
+        if (pattern == item) {
+          rebuiltPath.add(item);
+        }
+        else {
+          throw new Exception("Unexpected pattern. (Expected: $pattern, Instead: $item)");
+        }
+      }
+    }
+
+    // TODO: If successful, create Rule object
+    // For now, printing compilation result
+    print(rebuiltPath);
+    print(rebuiltParam);
+  }
+
+  bool isCompiled() => true;
+  bool hasError() => false;
+  
+  List<String> errors() {
     throw new UnimplementedError();
   }
 }
