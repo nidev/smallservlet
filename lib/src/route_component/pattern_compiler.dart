@@ -2,9 +2,9 @@
 
 /// URL pattern compiler
 /// This class will compile URL (in String) to Pattern object.
-/// 
+///
 /// Path separator is forward slash (/). Space(s) after/before pattern will be trimmed.
-/// 
+///
 /// Following patterns are available and valid:
 /// 1. * (Only allowed at tail. Only one occurrence is allowed. i.e. pattern '/users/*' is valid and will hook everything)
 /// 2. / (translated into /index.dart)
@@ -16,7 +16,7 @@
 /// 8. /users/account_info/{name}/{location}
 /// (translated into /users/account_info.dart with params = {name: (name here), location: (location here)}. Only allows consecuted template(s). See below.)
 /// 9. And with query string(?key1=value1&key2=value2...) with above patterns
-/// 
+///
 /// Following patterns are not valid:
 /// 1. Mixing .. or . in pattern
 /// (not allowed for security reason)
@@ -53,7 +53,7 @@ class URLPattern {
     if (patternTokens.length != pathTokens.length) {
       throw new Exception("Pattern can not be matched with given path. (Pattern tokens:${patternTokens.length}, given URL tokens: ${pathTokens.length})");
     }
-    
+
     for (var index = 0; index < patternTokens.length; index++) {
       var pattern = patternTokens[index];
       var item = urlPath[index];
@@ -61,16 +61,16 @@ class URLPattern {
       if (pattern.startsWith("{")) {
         // validating closing curly bracket
         if (!pattern.endsWith("}")) {
-          throw new Exception("Enclose template brackets correctly. ($pt)");
+          throw new Exception("Enclose template brackets correctly. ($pattern)");
         }
 
         // last added path is a Dart servlet. This will conclude accpeting servlet path.
-        
+
       }
       else {
         // detecting dangling brackets
         if (pattern.allMatches("[\{\}]")) {
-          throw new Exception("Incomplete template bracket(s) are found. ($pt)");
+          throw new Exception("Incomplete template bracket(s) are found. ($pattern)");
         }
 
         if (pattern == item) {
@@ -90,7 +90,7 @@ class URLPattern {
 
   bool isCompiled() => true;
   bool hasError() => false;
-  
+
   List<String> errors() {
     throw new UnimplementedError();
   }
