@@ -27,6 +27,8 @@
 /// 4. /users/add/{なまえ}/{生日}/{사는곳}
 /// (Non-ASCII characters in parameter template name, but parameter values with Non-ASCII characters are allowed when they are encoded in percent encoding.)
 class URLPattern {
+  final RegExp _unwrapper = new RegExp(r"\{([a-zA-Z0-9]+)}");
+
   URLPattern() {
     throw new UnimplementedError();
   }
@@ -36,27 +38,26 @@ class URLPattern {
     var pathTokens = urlPath.trim().split("/");
     var rebuiltPath = <String>[];
     var rebuiltParam = <String, String>{};
-    var foundAsteriskOnce = false;
-
-    if (!patternString.startsWith("/") || !urlPath.startsWith("/")) {
-      if (patternString == "*") {
-        rebuiltPath.add(patternString);
-        foundAsteriskOnce = true;
-        // TODO: Create Rule object
-        return; // Compile finished: asterisk
-      }
-      else {
-        throw new Exception("Pattern/Path must start with forward slash (/)");
-      }
-    }
+    var noMorePath = false;
 
     if (patternTokens.length != pathTokens.length) {
       throw new Exception("Pattern can not be matched with given path. (Pattern tokens:${patternTokens.length}, given URL tokens: ${pathTokens.length})");
     }
 
-    for (var index = 0; index < patternTokens.length; index++) {
+    for (var index = 0, length = patternTokens.length; index < length; index++) {
       var pattern = patternTokens[index];
       var item = urlPath[index];
+
+      // Accept only one asterisk, at tail position
+      if (patternString == "*") {
+        if (!noMorePath) {
+          rebuiltPath.add(patternString);
+          break;
+        }
+        else {
+          throw new Exception("Since template string started, you can not use asterisk more.");
+        }
+      }
 
       if (pattern.startsWith("{")) {
         // validating closing curly bracket
@@ -64,10 +65,41 @@ class URLPattern {
           throw new Exception("Enclose template brackets correctly. ($pattern)");
         }
 
-        // last added path is a Dart servlet. This will conclude accpeting servlet path.
+        // last added path is a Dart servlet. This will conclude accepting
+        // servlet path.
+        noMorePath = true;
 
+        if (rebuiltPath.isEmpty) {
+          // This one will be a index.dart
+          rebuiltPath.add("index.dart");
+        }
+        else {
+          if (!rebuiltPath.last.endsWith(".dart")) {
+            // Make last path item to Dart servlet
+            var estimatedServlet = rebuiltPath.last + ".dart";
+
+            rebuiltPath.removeLast();
+            rebuiltPath.add(estimatedServlet);
+          }
+        }
+
+        // And match place...
+        Match unwrapped = _unwrapper.firstMatch(pattern);
+        if ((unwrapped?.groupCount ?? 0) == 1) {
+          var pathName = unwrapped.group(0);
+          rebuiltParam[pathName] = pathTokens[index];
+        }
+        else {
+          // Void template name
+          throw new Exception("Template name can not be empty or filled with space");
+        }
       }
       else {
+        // Check whether it can accept more path item
+        if (noMorePath) {
+          throw new Exception("Can not accept more path, as template matching started before");
+        }
+
         // detecting dangling brackets
         if (pattern.allMatches("[\{\}]")) {
           throw new Exception("Incomplete template bracket(s) are found. ($pattern)");
