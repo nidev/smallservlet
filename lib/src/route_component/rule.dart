@@ -34,14 +34,19 @@ enum METHODS {
 class Rule {
   final ROUTE_COMMAND command;
   final Set<METHODS> acceptedMethods;
-  final URLPattern pattern;
+  final String pattern;
   final String nextRoute;
 
   Rule(ROUTE_COMMAND route_command, Set<METHODS> methods, String stringPattern, String nextRoutePath) :
     command = route_command,
     acceptedMethods = methods,
-    pattern = new URLPattern.compileFromString(stringPattern),
+    pattern = stringPattern,
     nextRoute = nextRoutePath;
+
+  bool isMatched(String url) {
+    URLPattern pattern = new URLPattern.compileFrom(this.pattern, url);
+    return pattern.isCompiled();
+  }
 
   String onRedirect(HttpRequest req, HttpResponse res) {
     throw new UnimplementedError();
