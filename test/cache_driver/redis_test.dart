@@ -11,7 +11,7 @@ void main(List<String> arguments) {
 
   RedisCacheDriver redisCacheDriver;
   redisCacheDriver = new RedisCacheDriver(redisKey: testKey);
-  
+
   group("RedisCacheDriver default specifications test", () {
     test("Has default cache size",
       () => expect(redisCacheDriver.getCacheSize(), greaterThan(0)));
@@ -29,7 +29,7 @@ void main(List<String> arguments) {
       expect(redisCacheDriver.checkBackbone(), completion(equals(true)));
       expect(redisCacheDriver.recoverBackbone(), completion(equals(true)));
     });
-    
+
     tearDown(() async {
       await redisCacheDriver.recoverBackbone();
     });
@@ -64,12 +64,12 @@ void main(List<String> arguments) {
 
     test("Tries to save an item", () async {
       await redisCacheDriver.store(paths[0], "1");
-      expect(await redisCacheDriver.hasValue(paths[0]), equals(true));
+      expect(await redisCacheDriver.hasKey(paths[0]), equals(true));
     });
 
     test("Tries to save multiple items", () async {
       List<Future> storingTasks = new List<Future>();
-      
+
       // Enqueuing Futures that request storing an item
       paths.forEach((path) {
         storingTasks.add(redisCacheDriver.store(path, "1"));
@@ -79,7 +79,7 @@ void main(List<String> arguments) {
       await Future.wait(storingTasks);
 
       paths.forEach((path) async {
-        expect(await redisCacheDriver.hasValue(path), equals(true));
+        expect(await redisCacheDriver.hasKey(path), equals(true));
       });
     });
 
