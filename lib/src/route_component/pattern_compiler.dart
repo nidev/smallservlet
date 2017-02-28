@@ -30,7 +30,7 @@ class URLPattern {
   final RegExp _unwrapper = new RegExp(r"\{([a-zA-Z0-9]+)}");
 
   URLPattern() {
-    throw new UnimplementedError();
+    throw new Exception("must call URLPattern.compileFrom() instead");
   }
 
   URLPattern.compileFrom(String patternString, String urlPath) {
