@@ -1,6 +1,10 @@
 // encoding: utf-8
 import "dart:io";
+import "package:smallservlet/src/logger.dart";
+import "package:smallservlet/src/exception/exceptions.dart";
 import "package:smallservlet/src/route_component/pattern_compiler.dart";
+
+const String TAG = "Rule";
 
 /// Available actions on SmallServlet routing rule
 enum ROUTE_COMMAND {
@@ -36,6 +40,7 @@ class Rule {
   final Set<METHODS> acceptedMethods;
   final String pattern;
   final String nextRoute;
+  URLPattern _compiledPattern;
 
   Rule(ROUTE_COMMAND route_command, Set<METHODS> methods, String stringPattern, String nextRoutePath) :
     command = route_command,
@@ -44,8 +49,24 @@ class Rule {
     nextRoute = nextRoutePath;
 
   bool isMatched(String url) {
-    URLPattern pattern = new URLPattern.compileFrom(this.pattern, url);
-    return pattern.isCompiled();
+    Logger log = new Logger(TAG);
+
+    try {
+      _compiledPattern = new URLPattern.compileFrom(this.pattern, url);
+      return true;
+    }
+    on PatternCompilerError catch (e) {
+      log.e(e.errorMsg);
+
+      if (e.errorReference.isNotEmpty) {
+        log.e("See ${e.errorReference} to cope with this problem");
+      }
+    }
+    catch (e) {
+      log.e(e);
+    }
+    
+    return false;
   }
 
   String onRedirect(HttpRequest req, HttpResponse res) {
