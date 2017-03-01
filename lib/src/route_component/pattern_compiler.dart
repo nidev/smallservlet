@@ -27,7 +27,7 @@
 /// 4. /users/add/{なまえ}/{生日}/{사는곳}
 /// (Non-ASCII characters in parameter template name, but parameter values with Non-ASCII characters are allowed when they are encoded in percent encoding.)
 class URLPattern {
-  final RegExp _unwrapper = new RegExp(r"\{([a-zA-Z0-9]+)}");
+  final RegExp _unwrapper = new RegExp(r"\{([a-zA-Z0-9]+)\}");
 
   URLPattern() {
     throw new Exception("must call URLPattern.compileFrom() instead");
