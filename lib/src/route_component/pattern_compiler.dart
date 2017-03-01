@@ -1,5 +1,7 @@
 // encoding: utf-8
 
+import "package:smallservlet/src/exception/exceptions.dart";
+
 /// URL pattern compiler
 /// This class will compile URL (in String) to Pattern object.
 ///
@@ -27,10 +29,12 @@
 /// 4. /users/add/{なまえ}/{生日}/{사는곳}
 /// (Non-ASCII characters in parameter template name, but parameter values with Non-ASCII characters are allowed when they are encoded in percent encoding.)
 class URLPattern {
-  final RegExp _unwrapper = new RegExp(r"\{([a-zA-Z0-9]+)\}");
+  final RegExp _unwrapper = new RegExp(r"\{([a-zA-Z0-9%]+)\}");
+  String compiledPath;
+  Map<String, String> compiledParam;
 
   URLPattern() {
-    throw new Exception("must call URLPattern.compileFrom() instead");
+    throw new Exception("must construct from URLPattern.compileFrom() instead");
   }
 
   URLPattern.compileFrom(String patternString, String urlPath) {
@@ -41,7 +45,7 @@ class URLPattern {
     var noMorePath = false;
 
     if (patternTokens.length != pathTokens.length) {
-      throw new Exception("Pattern can not be matched with given path. (Pattern tokens:${patternTokens.length}, given URL tokens: ${pathTokens.length})");
+      throw new PatternCompilerError("Pattern can not be matched with given path. (Pattern tokens:${patternTokens.length}, given URL tokens: ${pathTokens.length})");
     }
 
     for (var index = 0, length = patternTokens.length; index < length; index++) {
@@ -55,14 +59,14 @@ class URLPattern {
           break;
         }
         else {
-          throw new Exception("Since template string started, you can not use asterisk more.");
+          throw new PatternCompilerError("Since template string started, you can not use asterisk more.");
         }
       }
 
       if (pattern.startsWith("{")) {
         // validating closing curly bracket
         if (!pattern.endsWith("}")) {
-          throw new Exception("Enclose template brackets correctly. ($pattern)");
+          throw new PatternCompilerError("Enclose template brackets correctly. ($pattern)");
         }
 
         // last added path is a Dart servlet. This will conclude accepting
@@ -91,39 +95,32 @@ class URLPattern {
         }
         else {
           // Void template name
-          throw new Exception("Template name can not be empty or filled with space");
+          throw new PatternCompilerError("Template name can not be empty or filled with space");
         }
       }
       else {
         // Check whether it can accept more path item
         if (noMorePath) {
-          throw new Exception("Can not accept more path, as template matching started before");
+          throw new PatternCompilerError("Can not accept more path, as template matching started before");
         }
 
         // detecting dangling brackets
         if (pattern.allMatches("[\{\}]")) {
-          throw new Exception("Incomplete template bracket(s) are found. ($pattern)");
+          throw new PatternCompilerError("Incomplete template bracket(s) are found. ($pattern)");
         }
 
         if (pattern == item) {
           rebuiltPath.add(item);
         }
         else {
-          throw new Exception("Unexpected pattern. (Expected: $pattern, Instead: $item)");
+          throw new PatternCompilerError("Unexpected pattern. (Expected: $pattern, Instead: $item)");
         }
       }
     }
 
+    compiledPath = "/" + rebuiltPath.join("/");
+    compiledParam = rebuiltParam;
+
     // TODO: If successful, create Rule object
-    // For now, printing compilation result
-    print(rebuiltPath);
-    print(rebuiltParam);
-  }
-
-  bool isCompiled() => true;
-  bool hasError() => false;
-
-  List<String> errors() {
-    throw new UnimplementedError();
   }
 }
