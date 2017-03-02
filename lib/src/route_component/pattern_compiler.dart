@@ -50,7 +50,7 @@ class URLPattern {
 
     for (var index = 0, length = patternTokens.length; index < length; index++) {
       var pattern = patternTokens[index];
-      var item = urlPath[index];
+      var item = pathTokens[index];
 
       // Accept only one asterisk, at tail position
       if (patternString == "*") {
