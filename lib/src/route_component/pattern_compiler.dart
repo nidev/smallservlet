@@ -110,7 +110,18 @@ class URLPattern {
         }
 
         if (pattern == item) {
-          rebuiltPath.add(item);
+          if (rebuiltPath.isEmpty) {
+            rebuiltPath.add(item);
+          }
+          else {
+            if (pattern == "") {
+              rebuiltPath.add("index.dart");
+              noMorePath = true;
+            }
+            else {
+              rebuiltPath.add(item);
+            }
+          }
         }
         else {
           throw new PatternCompilerError("Unexpected pattern. (Expected: $pattern, Instead: $item)");
@@ -118,7 +129,11 @@ class URLPattern {
       }
     }
 
-    compiledPath = "/" + rebuiltPath.join("/");
+    compiledPath = rebuiltPath.join("/");
+    if (!compiledPath.startsWith("/")) {
+      compiledPath = "/$compiledPath";
+    }
+    
     compiledParam = rebuiltParam;
 
     // TODO: If successful, create Rule object
