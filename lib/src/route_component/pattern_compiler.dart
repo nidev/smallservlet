@@ -90,7 +90,7 @@ class URLPattern {
         // And match place...
         Match unwrapped = _unwrapper.firstMatch(pattern);
         if ((unwrapped?.groupCount ?? 0) == 1) {
-          var pathName = unwrapped.group(0);
+          var pathName = unwrapped.group(1);
           rebuiltParam[pathName] = pathTokens[index];
         }
         else {
@@ -133,7 +133,7 @@ class URLPattern {
     if (!compiledPath.startsWith("/")) {
       compiledPath = "/$compiledPath";
     }
-    
+
     compiledParam = rebuiltParam;
 
     // TODO: If successful, create Rule object
