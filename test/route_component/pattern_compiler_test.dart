@@ -15,39 +15,39 @@ void main(List<String> args) {
   });
 
   group("'URL without template path compilation' test", () {
-    test("Compile / => /index.dart", () {
+    test("Compiles / => /index.dart", () {
        pattern = new URLPattern.compileFrom("/", "/");
        expect(pattern.compiledPath, equals("/index.dart"));
     });
 
-    test("Compile /index.dart => /index.dart", () {
+    test("Compiles /index.dart => /index.dart", () {
        pattern = new URLPattern.compileFrom("/index.dart", "/index.dart");
        expect(pattern.compiledPath, equals("/index.dart"));
     });
 
-    test("Compile * => /*", () {
+    test("Compiles * => /*", () {
        pattern = new URLPattern.compileFrom("*", "*");
        expect(pattern.compiledPath, equals("/*"));
     });
 
-    test("Compile /* => /*", () {
+    test("Compiles /* => /*", () {
        pattern = new URLPattern.compileFrom("*", "*");
        expect(pattern.compiledPath, equals("/*"));
     });
 
-    test("Compile /users/ => /users/index.dart", () {
+    test("Compiles /users/ => /users/index.dart", () {
        pattern = new URLPattern.compileFrom("/users/", "/users/");
        expect(pattern.compiledPath, equals("/users/index.dart"));
     });
 
-    test("Compile /users/index.dart => /users/index.dart", () {
+    test("Compiles /users/index.dart => /users/index.dart", () {
        pattern = new URLPattern.compileFrom("/users/index.dart", "/users/index.dart");
        expect(pattern.compiledPath, equals("/users/index.dart"));
     });
   });
 
   group("'URL with template path compilation' test", () {
-    test("Compile /users/{name} with /users/foo => /users.dart with params {name: foo}", () {
+    test("Compiles /users/{name} with /users/foo => /users.dart with params {name: foo}", () {
        pattern = new URLPattern.compileFrom("/users/{name}", "/users/foo");
        expect(pattern.compiledPath, equals("/users.dart"));
        expect(pattern.compiledParam, isNotEmpty);
@@ -55,7 +55,7 @@ void main(List<String> args) {
        expect(pattern.compiledParam["name"], equals("foo"));
     });
 
-    test("Compile /users/{name}/{age} with /users/foo/15 => /users.dart with params {name: foo, age: 15}", () {
+    test("Compiles /users/{name}/{age} with /users/foo/15 => /users.dart with params {name: foo, age: 15}", () {
        pattern = new URLPattern.compileFrom("/users/{name}/{age}", "/users/foo/15");
        expect(pattern.compiledPath, equals("/users.dart"));
        expect(pattern.compiledParam, isNotEmpty);
