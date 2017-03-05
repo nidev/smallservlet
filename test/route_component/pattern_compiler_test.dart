@@ -25,19 +25,29 @@ void main(List<String> args) {
        expect(pattern.compiledPath, equals("/index.dart"));
     });
 
-    test("Compiles * => /*", () {
-       pattern = new URLPattern.compileFrom("*", "*");
+    test("Compiles /* => /*", () {
+       pattern = new URLPattern.compileFrom("/*", "/*");
        expect(pattern.compiledPath, equals("/*"));
     });
 
-    test("Compiles /* => /*", () {
-       pattern = new URLPattern.compileFrom("*", "*");
-       expect(pattern.compiledPath, equals("/*"));
+    test("Compiles /* with /, it is matched", () {
+       pattern = new URLPattern.compileFrom("/*", "/");
+       expect(pattern.compiledPath, isNotEmpty);
+    });
+
+    test("Compiles /* with /users/, it is matched", () {
+       pattern = new URLPattern.compileFrom("/*", "/users/");
+       expect(pattern.compiledPath, isNotEmpty);
     });
 
     test("Compiles /users/ => /users/index.dart", () {
        pattern = new URLPattern.compileFrom("/users/", "/users/");
        expect(pattern.compiledPath, equals("/users/index.dart"));
+    });
+
+    test("Compiles /users/* with /users/foo, it is matched", () {
+      pattern = new URLPattern.compileFrom("/users/*", "/users/foo");
+      expect(pattern.compiledPath, isNotEmpty);
     });
 
     test("Compiles /users/index.dart => /users/index.dart", () {
