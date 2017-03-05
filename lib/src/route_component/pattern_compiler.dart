@@ -53,9 +53,9 @@ class URLPattern {
       var item = pathTokens[index];
 
       // Accept only one asterisk, at tail position
-      if (patternString == "*") {
+      if (pattern == "*") {
         if (!noMorePath) {
-          rebuiltPath.add(patternString);
+          rebuiltPath.add(pattern);
           break;
         }
         else {
