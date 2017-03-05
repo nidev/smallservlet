@@ -44,10 +44,6 @@ class URLPattern {
     var rebuiltParam = <String, String>{};
     var noMorePath = false;
 
-    if (patternTokens.length != pathTokens.length) {
-      throw new PatternCompilerError("Pattern can not be matched with given path. (Pattern tokens:${patternTokens.length}, given URL tokens: ${pathTokens.length})");
-    }
-
     for (var index = 0, length = patternTokens.length; index < length; index++) {
       var pattern = patternTokens[index];
       var item = pathTokens[index];
