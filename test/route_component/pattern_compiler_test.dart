@@ -81,6 +81,20 @@ void main(List<String> args) {
   });
 
   group("'Disallowed URL pattern' test", () {
+    test("Does not allow using .. or . in pattern", () {
+      expect(() => new URLPattern.compileFrom("/../*", "/"), throws);
+      expect(() => new URLPattern.compileFrom("/./*", "/"), throws);
+      expect(() => new URLPattern.compileFrom("/../../", "/"), throws);
+    });
 
+    test("Does not allow using .. or . in path", () {
+      expect(() => new URLPattern.compileFrom("/*", "/.."), throws);
+      expect(() => new URLPattern.compileFrom("/*", "/."), throws);
+      expect(() => new URLPattern.compileFrom("/*", "/../index.dart"), throws);
+    });
+
+    test("Throws on re-occuring of path literal in pattern after template begins", () {
+      expect(() => new URLPattern.compileFrom("/a/{b}/c", "/a/b/c"), throws);
+    });
   });
 }
