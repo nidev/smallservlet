@@ -20,7 +20,7 @@ import "package:smallservlet/src/exception/exceptions.dart";
 /// 9. And with query string(?key1=value1&key2=value2...) with above patterns
 ///
 /// Following patterns are not valid:
-/// 1. Mixing .. or . in pattern
+/// 1. Mixing .. or . in either pattern or URL
 /// (not allowed for security reason)
 /// 2. /users/{name}/not_admin/{name}
 /// (Can not recognize which one is exact Dart-based servlet)
