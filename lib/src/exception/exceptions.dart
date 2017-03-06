@@ -16,6 +16,10 @@ class BaseError {
     when = new DateTime.now(),
     errorMsg = errorMsg,
     errorReference = reference;
+
+  @override String toString() {
+    return errorMsg;
+  }
 }
 
 class SmallServletError extends BaseError {}
