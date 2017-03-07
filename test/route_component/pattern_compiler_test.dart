@@ -14,6 +14,23 @@ void main(List<String> args) {
     });
   });
 
+  group("'Make query string parsed' test", () {
+    test("Checks parsed result is null when no query string is provided", () {
+      pattern = new URLPattern.compileFrom("/", "/");
+
+      expect(pattern.queryParam, isNull);
+    });
+
+    test("Checks query string is converted to Map<String, String>", () {
+      pattern = new URLPattern.compileFrom("/", "/?fruit=apple&count=1");
+
+      expect(pattern.queryParam, isNotNull);
+      expect(pattern.queryParam, isNotEmpty);
+      expect(pattern.queryParam["fruit"], equals("apple"));
+      expect(pattern.queryParam["count"], equals("1"));
+    });
+  });
+
   group("'URL without template path compilation' test", () {
     test("Compiles / => /index.dart", () {
        pattern = new URLPattern.compileFrom("/", "/");
