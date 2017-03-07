@@ -1,5 +1,6 @@
 // encoding: utf-8
 
+import "dart:convert";
 import "package:smallservlet/src/exception/exceptions.dart";
 
 /// URL pattern compiler
@@ -32,6 +33,7 @@ class URLPattern {
   final RegExp _unwrapper = new RegExp(r"\{([a-zA-Z0-9%]+)\}");
   String compiledPath;
   Map<String, String> compiledParam;
+  Map<String, String> queryParam;
 
   URLPattern() {
     throw new Exception("must construct from URLPattern.compileFrom() instead");
@@ -39,7 +41,8 @@ class URLPattern {
 
   URLPattern.compileFrom(String patternString, String urlPath) {
     var patternTokens = patternString.trim().split("/");
-    var pathTokens = urlPath.trim().split("/");
+    var basePath = urlPath.trim().split("?");
+    var pathTokens = basePath[0].split("/");
     var rebuiltPath = <String>[];
     var rebuiltParam = <String, String>{};
     var noMorePath = false;
@@ -128,6 +131,12 @@ class URLPattern {
     compiledPath = rebuiltPath.join("/");
     if (!compiledPath.startsWith("/")) {
       compiledPath = "/$compiledPath";
+    }
+
+    // if urlPath has query string, parse it and add result to params
+    if (basePath.length == 2) {
+      // TODO: Get Encoding from configuration
+      queryParam = Uri.splitQueryString(basePath[1], encoding: UTF8);
     }
 
     compiledParam = rebuiltParam;
