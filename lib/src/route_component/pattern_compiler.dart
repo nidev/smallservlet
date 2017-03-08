@@ -48,10 +48,15 @@ class URLPattern {
     var rebuiltPath = <String>[];
     var rebuiltParam = <String, String>{};
     var noMorePath = false;
+    var pos_patternString = 0;
+    var pos_pathString = 0;
 
     for (var index = 0, length = patternTokens.length; index < length; index++) {
       var pattern = patternTokens[index];
       var item = pathTokens[index];
+
+      pos_patternString++;
+      pos_pathString++;
 
       // Accept only one asterisk, at tail position
       if (pattern == "*") {
@@ -60,19 +65,22 @@ class URLPattern {
           break;
         }
         else {
-          throw new PatternCompilerError("Since template string started, you can not use asterisk more.");
+          throw new PatternCompilerError("Since template string started, you can not use more asterisk in pattern.", 1, pos_patternString);
         }
       }
 
       // Disallow using dots(., ..) or leading dots (.file, ..file) both pattern and path.
-      if (_leadingdots.hasMatch(pattern) || _leadingdots.hasMatch(item)) {
-        throw new PatternCompilerError("Leading dot(s) in either path or pattern is not allowed");
+      if (_leadingdots.hasMatch(pattern)) {
+        throw new PatternCompilerError("Leading dot(s) in pattern is not allowed", 1, pos_patternString);
+      }
+      if (_leadingdots.hasMatch(item)) {
+        throw new PatternCompilerError("Leading dot(s) in path is not allowed", 1, pos_pathString);
       }
 
       if (pattern.startsWith("{")) {
         // validating closing curly bracket
         if (!pattern.endsWith("}")) {
-          throw new PatternCompilerError("Enclose template brackets correctly. ($pattern)");
+          throw new PatternCompilerError("Enclose template brackets correctly, incorrect now. ($pattern)", 1, pos_patternString);
         }
 
         // last added path is a Dart servlet. This will conclude accepting
@@ -96,26 +104,32 @@ class URLPattern {
         // And match place...
         Match unwrapped = _unwrapper.firstMatch(pattern);
         if ((unwrapped?.groupCount ?? 0) == 1) {
+          pos_patternString += pattern.length;
+          pos_pathString += item.length;
+
           var pathName = unwrapped.group(1);
-          rebuiltParam[pathName] = pathTokens[index];
+          rebuiltParam[pathName] = item;
         }
         else {
           // Void template name
-          throw new PatternCompilerError("Template name can not be empty or filled with space");
+          throw new PatternCompilerError("Template name can not be empty or filled with space", 1, pos_patternString);
         }
       }
       else {
         // Check whether it can accept more path item
         if (noMorePath) {
-          throw new PatternCompilerError("Can not accept more path, as template matching started before");
+          throw new PatternCompilerError("Can not accept more path, as template matching started before", 1, pos_pathString);
         }
 
         // detecting dangling brackets
         if (pattern.allMatches("[\{\}]")) {
-          throw new PatternCompilerError("Incomplete template bracket(s) are found. ($pattern)");
+          throw new PatternCompilerError("Incomplete template bracket(s) are found. ($pattern)", 1, pos_patternString);
         }
 
         if (pattern == item) {
+          pos_patternString += pattern.length;
+          pos_pathString += item.length;
+
           if (rebuiltPath.isEmpty) {
             rebuiltPath.add(item);
           }
@@ -130,7 +144,7 @@ class URLPattern {
           }
         }
         else {
-          throw new PatternCompilerError("Unexpected pattern. (Expected: $pattern, Instead: $item)");
+          throw new PatternCompilerError("Unexpected path item, mismatched. (Expected: $pattern, Instead: $item)", 1, pos_pathString);
         }
       }
     }
