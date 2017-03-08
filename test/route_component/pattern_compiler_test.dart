@@ -18,16 +18,16 @@ void main(List<String> args) {
     test("Checks parsed result is null when no query string is provided", () {
       pattern = new URLPattern.compileFrom("/", "/");
 
-      expect(pattern.queryParam, isNull);
+      expect(pattern.param, isNull);
     });
 
     test("Checks query string is converted to Map<String, String>", () {
       pattern = new URLPattern.compileFrom("/", "/?fruit=apple&count=1");
 
-      expect(pattern.queryParam, isNotNull);
-      expect(pattern.queryParam, isNotEmpty);
-      expect(pattern.queryParam["fruit"], equals("apple"));
-      expect(pattern.queryParam["count"], equals("1"));
+      expect(pattern.param, isNotNull);
+      expect(pattern.param, isNotEmpty);
+      expect(pattern.param["fruit"], equals("apple"));
+      expect(pattern.param["count"], equals("1"));
     });
   });
 
@@ -105,13 +105,25 @@ void main(List<String> args) {
     });
 
     test("Does not allow using .. or . in path", () {
-      expect(() => new URLPattern.compileFrom("/*", "/.."), throws);
-      expect(() => new URLPattern.compileFrom("/*", "/."), throws);
-      expect(() => new URLPattern.compileFrom("/*", "/../index.dart"), throws);
+      expect(() => new URLPattern.compileFrom("/{dummy}", "/.."), throws);
+      expect(() => new URLPattern.compileFrom("/{dummy}", "/."), throws);
+      expect(() => new URLPattern.compileFrom("/{dummy}/", "/../index.dart"), throws);
     });
 
     test("Throws on re-occuring of path literal in pattern after template begins", () {
       expect(() => new URLPattern.compileFrom("/a/{b}/c", "/a/b/c"), throws);
+    });
+
+    test("Throws on space or control character in template name", () {
+      expect(() => new URLPattern.compileFrom("/users/{first name}", "/users/charles"), throws);
+      expect(() => new URLPattern.compileFrom("/users/{space\tlocation}", "/users/earth"), throws);
+      expect(() => new URLPattern.compileFrom("/users/{\r\n}", "/users/whatdidyousay"), throws);
+    });
+
+    test("Throws on non-alphanumeric template names in pattern", () {
+      expect(() => new URLPattern.compileFrom("/users/{이름}", "/users/charles"), throws);
+      expect(() => new URLPattern.compileFrom("/users/{場所}", "/users/earth"), throws);
+      expect(() => new URLPattern.compileFrom("/users/{AAアア11}", "/users/whatdidyousay"), throws);
     });
   });
 }

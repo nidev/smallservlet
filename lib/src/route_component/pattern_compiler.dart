@@ -30,10 +30,12 @@ import "package:smallservlet/src/exception/exceptions.dart";
 /// 4. /users/add/{なまえ}/{生日}/{사는곳}
 /// (Non-ASCII characters in parameter template name, but parameter values with Non-ASCII characters are allowed when they are encoded in percent encoding.)
 class URLPattern {
-  final RegExp _unwrapper = new RegExp(r"\{([a-zA-Z0-9%]+)\}");
+  static final RegExp _unwrapper = new RegExp(r"\{([a-zA-Z0-9%]+)\}");
+  static final RegExp _leadingdots = new RegExp(r"^[.]+");
+
   String compiledPath;
   Map<String, String> compiledParam;
-  Map<String, String> queryParam;
+  Map<String, String> param;
 
   URLPattern() {
     throw new Exception("must construct from URLPattern.compileFrom() instead");
@@ -60,6 +62,11 @@ class URLPattern {
         else {
           throw new PatternCompilerError("Since template string started, you can not use asterisk more.");
         }
+      }
+
+      // Disallow using dots(., ..) or leading dots (.file, ..file) both pattern and path.
+      if (_leadingdots.hasMatch(pattern) || _leadingdots.hasMatch(item)) {
+        throw new PatternCompilerError("Leading dot(s) in either path or pattern is not allowed");
       }
 
       if (pattern.startsWith("{")) {
@@ -136,7 +143,7 @@ class URLPattern {
     // if urlPath has query string, parse it and add result to params
     if (basePath.length == 2) {
       // TODO: Get Encoding from configuration
-      queryParam = Uri.splitQueryString(basePath[1], encoding: UTF8);
+      param = Uri.splitQueryString(basePath[1], encoding: UTF8);
     }
 
     compiledParam = rebuiltParam;
