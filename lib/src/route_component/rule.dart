@@ -40,7 +40,6 @@ class Rule {
   final Set<METHODS> acceptedMethods;
   final String pattern;
   final String nextRoute;
-  URLPattern _compiledPattern;
 
   Rule(ROUTE_COMMAND route_command, Set<METHODS> methods, String stringPattern, String nextRoutePath) :
     command = route_command,
@@ -52,7 +51,7 @@ class Rule {
     Logger log = new Logger(TAG);
 
     try {
-      _compiledPattern = new URLPattern.compileFrom(this.pattern, url);
+      new URLPattern.compileFrom(this.pattern, url);
       return true;
     }
     on PatternCompilerError catch (e) {
@@ -65,7 +64,7 @@ class Rule {
     catch (e) {
       log.e(e);
     }
-    
+
     return false;
   }
 
