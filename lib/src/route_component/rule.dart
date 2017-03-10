@@ -55,7 +55,7 @@ class Rule {
   }
 
   bool isMatched(String url) {
-    Logger log = new Logger(TAG);
+    var log = new Logger(TAG);
 
     try {
       new URLPattern.compileFrom(this.pattern, url);
