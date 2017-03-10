@@ -7,7 +7,7 @@ import "package:smallservlet/src/route_component/pattern_compiler.dart";
 const String TAG = "Rule";
 
 /// Available actions on SmallServlet routing rule
-enum ROUTE_COMMAND {
+enum RouteCommand {
   /// Serves static datum/file in exact rootdir path (i.e. http://localhost/imgs/image.png will serve $rootdir/imgs/image.png)
   STATIC,
   /// Serves Dart-based servlet in Isolated context (See [Dart Isolate API](https://api.dartlang.org/stable/1.22.1/dart-isolate/Isolate-class.html) on official site)
@@ -22,8 +22,8 @@ enum ROUTE_COMMAND {
   FORWARD
 }
 
-/// Predefined allowed HTTP methods
-enum METHODS {
+/// Predefined allowed HTTP HttpMethod
+enum HttpMethod {
   /// HTTP GET method
   GET,
   /// HTTP POST method
@@ -36,18 +36,18 @@ enum METHODS {
 
 /// URL Routing rule for SmallServlet and router.dart
 class Rule {
-  final ROUTE_COMMAND command;
-  final Set<METHODS> acceptedMethods;
+  final RouteCommand command;
+  final Set<HttpMethod> acceptedHttpMethod;
   final String pattern;
   final String nextRoute;
 
-  Rule(ROUTE_COMMAND route_command, Set<METHODS> methods, String stringPattern, { String nextRoutePath }) :
-    command = route_command,
-    acceptedMethods = methods,
+  Rule(RouteCommand routeCommand, Set<HttpMethod> HttpMethod, String stringPattern, { String nextRoutePath }) :
+    command = routeCommand,
+    acceptedHttpMethod = HttpMethod,
     pattern = stringPattern,
     nextRoute = nextRoutePath {
       // If forwarding/redirecting, nextRoutePath should be available.
-      if (route_command == ROUTE_COMMAND.REDIRECT || route_command == ROUTE_COMMAND.FORWARD) {
+      if (command == RouteCommand.REDIRECT || RouteCommand == RouteCommand.FORWARD) {
         if (nextRoute == null) {
           throw new Exception("On redirecting/forwarding, next route should be available");
         }
