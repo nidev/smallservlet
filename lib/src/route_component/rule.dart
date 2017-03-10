@@ -41,11 +41,18 @@ class Rule {
   final String pattern;
   final String nextRoute;
 
-  Rule(ROUTE_COMMAND route_command, Set<METHODS> methods, String stringPattern, String nextRoutePath) :
+  Rule(ROUTE_COMMAND route_command, Set<METHODS> methods, String stringPattern, { String nextRoutePath }) :
     command = route_command,
     acceptedMethods = methods,
     pattern = stringPattern,
-    nextRoute = nextRoutePath;
+    nextRoute = nextRoutePath {
+      // If forwarding/redirecting, nextRoutePath should be available.
+      if (route_command == ROUTE_COMMAND.REDIRECT || route_command == ROUTE_COMMAND.FORWARD) {
+        if (nextRoute == null) {
+          throw new Exception("On redirecting/forwarding, next route should be available");
+        }
+      }
+  }
 
   bool isMatched(String url) {
     Logger log = new Logger(TAG);
