@@ -2,7 +2,7 @@
 import "dart:io";
 import "package:smallservlet/src/logger.dart";
 import "package:smallservlet/src/exception/exceptions.dart";
-import "package:smallservlet/src/route_component/pattern_compiler.dart";
+import "package:smallservlet/src/route_component/urlpattern.dart";
 
 const String TAG = "Rule";
 
@@ -40,6 +40,11 @@ class Rule {
   final Set<HttpMethod> acceptedHttpMethod;
   final String pattern;
   final String nextRoute;
+  URLPattern _compiledPattern;
+
+  String get destination {
+    return _compiledPattern.destination;
+  }
 
   Rule(RouteCommand routeCommand, Set<HttpMethod> HttpMethod, String stringPattern, { String nextRoutePath }) :
     command = routeCommand,
