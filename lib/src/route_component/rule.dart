@@ -1,4 +1,7 @@
 // encoding: utf-8
+
+library route_component;
+
 import "dart:io";
 import "package:smallservlet/src/logger.dart";
 import "package:smallservlet/src/exception/exceptions.dart";
@@ -40,31 +43,31 @@ class Rule {
   final Set<HttpMethod> acceptedHttpMethod;
   final String pattern;
   final String nextRoute;
-  URLPattern _compiledPattern;
-
-  String get destination {
-    return _compiledPattern.destination;
-  }
+  URLPattern _urlpattern;
 
   Rule(RouteCommand routeCommand, Set<HttpMethod> HttpMethod, String stringPattern, { String nextRoutePath }) :
     command = routeCommand,
     acceptedHttpMethod = HttpMethod,
     pattern = stringPattern,
     nextRoute = nextRoutePath {
-      // If forwarding/redirecting, nextRoutePath should be available.
-      if (command == RouteCommand.REDIRECT || RouteCommand == RouteCommand.FORWARD) {
-        if (nextRoute == null) {
-          throw new Exception("On redirecting/forwarding, next route should be available");
-        }
+
+    // If forwarding/redirecting, nextRoutePath should be available.
+    if (command == RouteCommand.REDIRECT || RouteCommand == RouteCommand.FORWARD) {
+      if (nextRoute == null) {
+        throw new Exception("On redirecting/forwarding, next route should be available");
       }
+    }
+
+    _urlpattern = new URLPattern(stringPattern);
+
+    throw new UnimplementedError();
   }
 
-  bool isMatched(String url) {
+  bool isMatched(String urlPath) {
     var log = new Logger(TAG);
 
     try {
-      new URLPattern.compileFrom(this.pattern, url);
-      return true;
+      return _urlpattern.isServletPathMatched(urlPath);
     }
     on PatternCompilerError catch (e) {
       log.e(e.errorMsg);
