@@ -9,16 +9,15 @@ import "package:smallservlet/src/route_component/compiler.dart";
 /// This class contains precompiled URL matcher and presents location of exact Dart servlet.
 class URLPattern {
   final URLPatternCompiler _compiler;
-  String get dartServlet {
-    return _compiler.servletPath;
+
+  String get dartFile {
+    return _compiler.dartLocation;
   }
 
-  URLPattern(String pt) : this._compiler = new URLPatternCompiler(pt) {
+  URLPattern(String pt) : this._compiler = new URLPatternCompiler(pt);
 
-  }
-
-  bool isServletPathMatched(String urlPath) { // TODO: override equal operator
-    throw new UnimplementedError();
+  bool isServletPathMatched(String urlPath) {
+    return _compiler.respondable(urlPath);
   }
 
   Map<String, String> parsePath(String urlPath) {
