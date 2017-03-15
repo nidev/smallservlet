@@ -53,10 +53,15 @@ class URLPatternCompiler {
 
   List<CompilerInst> _inst;
   List<String> _matcher;
-  String _servletPath;
+
+  String _dartLocation;
+
+  String get dartLocation {
+    return _dartLocation;
+  }
 
   String get servletPath {
-    return _servletPath;
+    return _dartLocation.substring(0, _dartLocation.length - 5);
   }
 
   URLPatternCompiler(String source) {
@@ -174,10 +179,10 @@ class URLPatternCompiler {
       }
     }
 
-    _servletPath = rebuiltPath.join("/");
+    _dartLocation = rebuiltPath.join("/");
 
-    if (!_servletPath.startsWith("/")) {
-      _servletPath = "/$_servletPath";
+    if (!_dartLocation.startsWith("/")) {
+      _dartLocation = "/$_dartLocation";
     }
   }
 
@@ -240,13 +245,13 @@ class URLPatternCompiler {
       // Nothing to do, for breaking nested loop
     }
 
-    var parsedServletPath = rebuiltPath.join("/");
+    var parseddartLocation = rebuiltPath.join("/");
 
-    if (!parsedServletPath.startsWith("/")) {
-      parsedServletPath = "/$_servletPath";
+    if (!parseddartLocation.startsWith("/")) {
+      parseddartLocation = "/$_dartLocation";
     }
 
-    if (parsedServletPath != _servletPath) {
+    if (parseddartLocation != _dartLocation) {
       throw new PatternCompilerError("Unsuitable pattern");
     }
 
@@ -258,5 +263,10 @@ class URLPatternCompiler {
     }
 
     return rebuiltParam;
+  }
+
+  /// If testUrl starts with compiled servletPath, this servlet may respond with parsed data.
+  bool respondable(String testUrl) {
+    return testUrl.startsWith(servletPath);
   }
 }
