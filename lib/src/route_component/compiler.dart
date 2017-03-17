@@ -178,7 +178,7 @@ class URLPatternCompiler {
         else {
           //noMorePath = true;
           rebuiltPath.add("");
-          _pushData(CompilerInst.T, "");
+          _pushData(CompilerInst.M, "");
         }
       }
     }
