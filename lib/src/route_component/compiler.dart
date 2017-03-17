@@ -135,10 +135,13 @@ class URLPatternCompiler {
 
             var servlet = rebuiltPath.last + ".dart";
 
-            _pushData(CompilerInst.T, rebuiltPath.last);
-
+            // Make last item has '.dart' extension
             rebuiltPath.removeLast();
             rebuiltPath.add(servlet);
+
+            // Make last item as a terminal item
+            _inst.removeLast();
+            _inst.add(CompilerInst.T);
           }
         }
 
