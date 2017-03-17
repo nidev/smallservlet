@@ -7,7 +7,6 @@ import "package:smallservlet/src/logger.dart";
 import "package:smallservlet/src/exception/exceptions.dart";
 
 const String TAG = "PCompiler";
-const String INDEX_DART = "index.dart";
 
 /// Compiler Instruction for URL pattern compiler
 enum CompilerInst {
@@ -124,7 +123,7 @@ class URLPatternCompiler {
 
         if (rebuiltPath.isEmpty) {
           // This one will be a index.dart
-          rebuiltPath.add(INDEX_DART);
+          rebuiltPath.add("");
 
           _pushData(CompilerInst.T, "");
         }
@@ -167,16 +166,21 @@ class URLPatternCompiler {
         }
 
         if (token.isNotEmpty) {
-          noMorePath = true;
           pos_patternString += pattern.length;
-
+          rebuiltPath.add(token);
           _pushData(CompilerInst.M, token);
         }
         else {
-          rebuiltPath.add(INDEX_DART);
+          //noMorePath = true;
+          rebuiltPath.add("");
           _pushData(CompilerInst.T, "");
         }
       }
+    }
+
+    if (rebuiltPath.last.isEmpty) {
+      rebuiltPath.removeLast();
+      rebuiltPath.add("index.dart");
     }
 
     _dartLocation = rebuiltPath.join("/");
@@ -214,7 +218,7 @@ class URLPatternCompiler {
               rebuiltPath.add(path);
             }
             else {
-              throw new PatternCompilerError("Unmatched URL. (Expected: , Got: )");
+              throw new PatternCompilerError("Unmatched URL. (Expected: ${matcher}, Got: ${path})");
             }
             break;
           case CompilerInst.E:
@@ -230,7 +234,7 @@ class URLPatternCompiler {
               throw path; // found terminator
             }
             else {
-              throw new PatternCompilerError("Unmatched terminator. (Expect: , Got :)");
+              throw new PatternCompilerError("Unmatched terminator. (Expected: ${matcher}, Got: ${path})");
             }
             break;
           default:
@@ -245,14 +249,19 @@ class URLPatternCompiler {
       // Nothing to do, for breaking nested loop
     }
 
+    if (rebuiltPath.last.isEmpty) {
+      rebuiltPath.removeLast();
+      rebuiltPath.add("index.dart");
+    }
+
     var parseddartLocation = rebuiltPath.join("/");
 
     if (!parseddartLocation.startsWith("/")) {
-      parseddartLocation = "/$_dartLocation";
+      parseddartLocation = "/${parseddartLocation}";
     }
 
     if (parseddartLocation != _dartLocation) {
-      throw new PatternCompilerError("Unsuitable pattern");
+      throw new PatternCompilerError("Unmatched dart servlet location (Expected: ${_dartLocation}, Got: ${parseddartLocation})");
     }
 
     // if urlPath has query string, parse it and add result to params
