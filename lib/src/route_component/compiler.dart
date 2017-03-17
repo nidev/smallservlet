@@ -98,6 +98,8 @@ class URLPatternCompiler {
       // Accept only one asterisk, at tail position
       if (token == "*") {
         if (!noMorePath) {
+          _pushData(CompilerInst.A, token);
+
           rebuiltPath.add(token);
           break;
         }
