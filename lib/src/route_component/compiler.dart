@@ -204,6 +204,7 @@ class URLPatternCompiler {
     var rebuiltPath = <String>[];
     var rebuiltParam = <String, String>{};
     var pos_pathString = 0;
+    var foundAsteriskMatching = false;
 
     try {
       for (var index = 0, length = pathTokens.length; index < length; index++) {
@@ -230,13 +231,16 @@ class URLPatternCompiler {
             rebuiltParam[matcher] = path;
             break;
           case CompilerInst.A:
+            foundAsteriskMatching = true;
             rebuiltPath.add(matcher);
             throw matcher; // expect '*' for this case.
             break;
           case CompilerInst.T:
             if (path == matcher) {
+              if (!path.endsWith(".dart")) {
+                path = "${path}.dart";
+              }
               rebuiltPath.add(path);
-              throw path; // found terminator
             }
             else {
               throw new PatternCompilerError("Unmatched terminator. (Expected: ${matcher}, Got: ${path})");
@@ -265,7 +269,10 @@ class URLPatternCompiler {
       parseddartLocation = "/${parseddartLocation}";
     }
 
-    if (parseddartLocation != _dartLocation) {
+    if (!foundAsteriskMatching && parseddartLocation != _dartLocation) {
+      print(_inst);
+      print(_matcher);
+      print(_matcher.length);
       throw new PatternCompilerError("Unmatched dart servlet location (Expected: ${_dartLocation}, Got: ${parseddartLocation})");
     }
 
