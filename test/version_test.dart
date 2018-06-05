@@ -2,7 +2,7 @@
 import "package:test/test.dart";
 import "package:smallservlet/version.dart";
 
-void main(List<String> args) {
+void main() {
   group("'SmallServlet version constants' test", () {
     test("Checks proper (>= 0) major version is set", () {
       expect(VERSION_MAJOR, greaterThanOrEqualTo(0));

@@ -5,7 +5,7 @@ import "package:smallservlet/src/cache_driver/redis.dart";
 
 const String DRIVER_TEST_KEY_PREFIX = "default_spec_test";
 
-void main(List<String> arguments) {
+void main() {
   // Generate randomized suffix for
   final String testKey = "${DRIVER_TEST_KEY_PREFIX}:${new DateTime.now().microsecond}";
 

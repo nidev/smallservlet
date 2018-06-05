@@ -32,7 +32,7 @@ class DummyLogWriter extends LogWriter {
   }
 }
 
-void main(List<String> args) {
+void main() {
   group("'Constants validation' test", () {
     test("Has 4 enum values in LOG_LEVELS", () {
       expect(LOG_LEVELS.values.length, equals(4));
