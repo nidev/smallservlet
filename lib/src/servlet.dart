@@ -17,7 +17,7 @@ const Map<PathKey, String> SSPATH = const {
 class ServletEngine {
   BaseCacheDriver _cache;
   int _maxConnection = 0;
-  dynamic _SVhost = InternetAddress.ANY_IP_V6 ;
+  dynamic _SVhost = InternetAddress.anyIPv6 ;
   String _rootdir = "/var/lib/smallservlet/";
   int _SVport;
 
@@ -81,7 +81,7 @@ class ServletEngine {
       log.n("Operation Test: Temporary dir Read/Write");
       File tempFile = new File(Path.join(_rootdir, SSPATH[PathKey.TEMP_DIR], "io_test"));
       tempFile.createSync();
-      tempFile.writeAsBytesSync([0], mode: FileMode.WRITE, flush: true);
+      tempFile.writeAsBytesSync([0], mode: FileMode.write, flush: true);
     }));
 
     log.n("Operation Test: Port availability");

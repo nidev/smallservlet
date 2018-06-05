@@ -37,17 +37,17 @@ void main() {
 
   group("'Parameter guard' test", () {
     test("Blank redis key throws exception at constructor", () {
-      expect(() => new RedisCacheDriver(redisKey: ""), throws);
+      expect(() => new RedisCacheDriver(redisKey: ""), throwsA);
     });
 
     test("Gets error on trying to set cache size to number less than zero", () {
       // TODO: Test with more negative numbers
-      expect(() => redisCacheDriver.setCacheSize(-1), throws);
+      expect(() => redisCacheDriver.setCacheSize(-1), throwsA);
     });
 
     test("Gets error on trying to set lifetime seconds to number less than zero", () {
       // TODO: Test with more negative numbers
-      expect(() => redisCacheDriver.setLifetimeSeconds(-1), throws);
+      expect(() => redisCacheDriver.setLifetimeSeconds(-1), throwsA);
     });
   });
 

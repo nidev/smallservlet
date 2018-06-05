@@ -118,7 +118,7 @@ class SSConfiguration {
     String serialized = encoder.convert(_configMap).replaceAll("\n", PlatformUtil.newLine);
 
     return targetFile.writeAsString(serialized,
-      mode: FileMode.WRITE,
+      mode: FileMode.write,
       encoding: Encoding.getByName("UTF-8"),
       flush: true);
   }
@@ -138,7 +138,7 @@ class SSConfiguration {
     });
 
     return targetFile.writeAsString(stringBuffer.toString(),
-      mode: FileMode.WRITE,
+      mode: FileMode.write,
       encoding: Encoding.getByName("UTF-8"),
       flush: true);
   }
