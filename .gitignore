@@ -35,6 +35,9 @@ doc/api/
 # (Library packages only! Remove pattern if developing an application package)
 pubspec.lock
 
+# .dart_tool
+.dart_tool
+
 # End of https://www.gitignore.io/api/dart
 
 # Editor caches
