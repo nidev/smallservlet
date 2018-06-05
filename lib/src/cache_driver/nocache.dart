@@ -84,7 +84,7 @@ class NoCacheDriver implements BaseCacheDriver {
   /**
    * Clear cache. NoCacheDriver does nothing.
    */
-  Future emptify() async {
+  Future<Null> emptify() async {
     return new Future.value(null);
   }
 
