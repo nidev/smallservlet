@@ -30,8 +30,12 @@ class VersionData implements Comparable {
       || (this._major == other._major && this._minor <= other._minor);
   }
 
-  bool operator==(VersionData other) {
-    return (this._major == other._major && this._minor == other._minor);
+  bool operator==(dynamic versionData) {
+    if (versionData is VersionData) {
+      return (this._major == versionData._major && this._minor == versionData._minor);
+    }
+
+    throw new ArgumentError("Invalid operand type for comparing VersionData object");
   }
 
   bool operator>(VersionData other) {
