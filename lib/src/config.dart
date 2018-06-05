@@ -59,8 +59,7 @@ class SSConfiguration {
       _configMap = JSON.decode(contents);
     }
     else if (fname.endsWith(".yaml")) {
-      Yaml.YamlMap yamlMap = Yaml.loadYaml(contents);
-      _configMap = yamlMap;
+      _configMap = Yaml.loadYaml(contents);
     }
     else {
       throw new Exception("Unsupported file extension. Should be either .json or .yaml");
