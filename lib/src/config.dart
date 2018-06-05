@@ -56,7 +56,8 @@ class SSConfiguration {
     String contents = _readFile();
 
     if (fname.endsWith(".json")) {
-      _configMap = JSON.decode(contents);
+      var jsonDecoder = new JsonDecoder();
+      _configMap = jsonDecoder.convert(contents);
     }
     else if (fname.endsWith(".yaml")) {
       _configMap = Yaml.loadYaml(contents);
